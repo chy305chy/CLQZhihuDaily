@@ -1,0 +1,38 @@
+PODS:
+  - Alamofire (4.2.0)
+  - IQKeyboardManagerSwift (4.0.8)
+  - ReactiveCocoa (5.0.3):
+    - ReactiveSwift (~> 1.1)
+  - ReactiveSwift (1.1.1):
+    - Result (~> 3.2)
+  - Result (3.2.1)
+  - SDWebImage (4.0.0):
+    - SDWebImage/Core (= 4.0.0)
+  - SDWebImage/Core (4.0.0)
+  - SnapKit (3.1.2)
+  - Toast-Swift (2.0.0)
+  - YYText (1.0.7)
+
+DEPENDENCIES:
+  - Alamofire
+  - IQKeyboardManagerSwift
+  - ReactiveCocoa (~> 5.0.3)
+  - SDWebImage
+  - SnapKit
+  - Toast-Swift
+  - YYText
+
+SPEC CHECKSUMS:
+  Alamofire: aa2e09d871c9160ac53c90e83c68064a94e3dfbe
+  IQKeyboardManagerSwift: c04bc9f68473823f825eb44d958fce98d921bead
+  ReactiveCocoa: 066a855f613fb72f68258771095805fdb10312d2
+  ReactiveSwift: 2489549e3231a6ff68ec99f3d320bb264f10ba0a
+  Result: 2453a22e5c5b11c0c3a478736e82cd02f763b781
+  SDWebImage: 76a6348bdc74eb5a55dd08a091ef298e56b55e41
+  SnapKit: 12b24f569cb7c143acc9c22b9d91b23e7b1c84a2
+  Toast-Swift: 5b2f8f720f7e78e48511f693df1f9c9a6e38a25a
+  YYText: 5c461d709e24d55a182d1441c41dc639a18a4849
+
+PODFILE CHECKSUM: 8bf93e3446653b92afcfd9305aee78c81d85b6fc
+
+COCOAPODS: 1.2.0
