@@ -12,7 +12,7 @@ import Result
 import Alamofire
 
 class StoryDataUtil: NSObject {
-    // 最新story
+    // 最新story，通过管道创建热信号
     let (latestStorySignal, latestStoryObserver) = Signal<AnyObject, NoError>.pipe()
     // 之前的story
     let (previousStorySignal, previousStoryObserver) = Signal<AnyObject, NoError>.pipe()
@@ -59,9 +59,11 @@ class StoryDataUtil: NSObject {
             switch(response.result) {
             case .success:
                 self.detailStoryObserver.send(value: response.result.value as AnyObject)
+                self.detailStoryObserver.sendCompleted()
                 break
-            case .failure(_):
+            case .failure(let error):
                 print("获取story详情数据失败！")
+                self.detailStoryObserver.send(error: error as! NoError)
                 break
             }
         }

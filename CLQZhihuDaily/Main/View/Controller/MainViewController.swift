@@ -20,7 +20,6 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
     let sectionHeaderHeight: CGFloat = 44
     
     @IBOutlet var panGesture: UIPanGestureRecognizer!
-    @IBOutlet weak var tableView: UITableView!
     
     // 下拉完成后加载数据的指示器view
     var loadingActivityView: UIActivityIndicatorView!
@@ -30,7 +29,7 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
     var navTitleLabel: UILabel!
     // 顶部轮播图片view
     var cyclePictureView: CyclePictureView!
-    var storyBriefViewModel: StoryBriefViewModel!
+    var storyBriefViewModel: StoryViewModel!
     /* 判断下拉是否完成并进入刷新状态 */
     var refreshTrigger: Bool!
     
@@ -39,8 +38,13 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     /* 第二个section的offsetY，用于隐藏NavBar */
     lazy var secondSectionOffsetY: CGFloat = {
-        let n = CGFloat(self.tableView.numberOfRows(inSection: 0)) * self.cellHeight + self.topScrollViewHeight + self.sectionHeaderHeight
+        let n = CGFloat(self.storyTableView.numberOfRows(inSection: 0)) * self.cellHeight + self.topScrollViewHeight + self.sectionHeaderHeight
         return n
+    }()
+    
+    lazy var storyTableView: UITableView = {
+        let tmpTableView = UITableView(frame: CGRect(x: 0, y: 0, width: 0, height: 0), style: .plain);
+        return tmpTableView;
     }()
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
@@ -78,14 +82,17 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
         pullDistance = UIApplication.shared.statusBarFrame.size.height + (self.navigationController?.navigationBar.frame.size.height)!
         
         self.view.backgroundColor = UIColor.gray;
-        storyBriefViewModel = StoryBriefViewModel()
+        storyBriefViewModel = StoryViewModel()
         
-        self.tableView.register(UINib(nibName: "ListStoryCell", bundle: nil), forCellReuseIdentifier: "storyCell")
-        self.tableView.frame = CGRect(x: 0, y: 0, width: self.view.frame.size.width, height: self.view.frame.size.height)
-        self.tableView.contentInset = UIEdgeInsetsMake(-self.pullDistance, 0, 0, 0)
-        self.tableView.delegate = self
-        self.tableView.dataSource = self
-        self.tableView.showsVerticalScrollIndicator = false
+        self.storyTableView.register(UINib(nibName: "ListStoryCell", bundle: nil), forCellReuseIdentifier: "storyCell")
+        self.storyTableView.frame = CGRect(x: 0, y: 0, width: self.view.frame.size.width, height: self.view.frame.size.height)
+        self.storyTableView.contentInset = UIEdgeInsetsMake(-self.pullDistance, 0, 0, 0)
+        self.storyTableView.delegate = self
+        self.storyTableView.dataSource = self
+        self.storyTableView.showsVerticalScrollIndicator = false
+        self.storyTableView.separatorInset = UIEdgeInsetsMake(0, 10, 0, 15);
+        self.storyTableView.separatorColor = UIColor(colorLiteralRed: 235/255, green: 235/255, blue: 235/255, alpha: 1.0);
+        self.view.addSubview(self.storyTableView)
         
         setNavigationBarTransparent()
         
@@ -94,7 +101,7 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
         let storySubscriber = Observer<AnyObject, NoError>(value: { (_) in
             self.cyclePictureView.imageURLArray = self.storyBriefViewModel.topStoryImageUrls
             self.cyclePictureView.imageTitleArray = self.storyBriefViewModel.topStoryImageTitles
-            self.tableView.reloadData()
+            self.storyTableView.reloadData()
         }, failed: nil, completed: nil, interrupted: nil)
         storyBriefViewModel.storySignal.observe(storySubscriber)
         storyBriefViewModel.fetchLatestStoriesCommand()
@@ -102,7 +109,7 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
         let preStorySubscriber = Observer<AnyObject, NoError>(value: { (value) in
             if value.boolValue! {
                 self.isLoadingPreviousData = false
-                self.tableView.reloadData()
+                self.storyTableView.reloadData()
             }
         }, failed: nil, completed: nil, interrupted: nil)
         storyBriefViewModel.preStorySignal.observe(preStorySubscriber)
@@ -116,7 +123,7 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
         cyclePictureView.otherDotColor = UIColor.lightGray
         cyclePictureView.timeInterval = 3.5
         cyclePictureView.pictureContentMode = UIViewContentMode.scaleAspectFill
-        self.tableView.tableHeaderView = cyclePictureView
+        self.storyTableView.tableHeaderView = cyclePictureView
     }
     
     /// 设置navBar透明
@@ -163,11 +170,13 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let model = storyBriefViewModel.listStoryModels[indexPath.section][indexPath.row]
-        fetchDetailStoryData(withId: model.storyId)
+        DispatchQueue.main.async {
+            self.fetchDetailStoryData(withId: model.storyId)
+        }
     }
     
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-        if self.tableView.contentOffset.y <= 0 && !refreshTrigger {
+        if self.storyTableView.contentOffset.y <= 0 && !refreshTrigger {
             refreshLatestStory()
         }
     }
@@ -207,11 +216,11 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
             }
             
             if offsetY > self.secondSectionOffsetY {
-                self.tableView.contentInset = UIEdgeInsetsMake(20, 0, 0, 0)
+                self.storyTableView.contentInset = UIEdgeInsetsMake(20, 0, 0, 0)
                 self.navTitleLabel.text = ""
                 self.navigationController?.navigationBar.clq_setBackgroundLayerHeight(height: 20)
             }else {
-                self.tableView.contentInset = UIEdgeInsetsMake(-self.pullDistance, 0, 0, 0)
+                self.storyTableView.contentInset = UIEdgeInsetsMake(-self.pullDistance, 0, 0, 0)
                 self.navTitleLabel.text = "今日热闻"
                 self.navigationController?.navigationBar.clq_setBackgroundLayerHeight(height: self.pullDistance)
             }
@@ -231,7 +240,7 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
             self.loadCircleAnimatedView.updateCircle(byRatio: 0)
             self.refreshTrigger = false
             self.loadingActivityView.stopAnimating()
-            self.tableView.contentOffset.y = self.pullDistance
+            self.storyTableView.contentOffset.y = self.pullDistance
         })
     }
     

@@ -1,5 +1,5 @@
 //
-//  StoryBriefViewModel.swift
+//  StoryViewModel.swift
 //  CLQZhihuDaily
 //
 //  Created by 崔岚清 on 2017/2/17.
@@ -10,7 +10,7 @@ import UIKit
 import ReactiveSwift
 import Result
 
-class StoryBriefViewModel: NSObject {
+class StoryViewModel: NSObject {
     
     lazy var listStoryModels = Array<Array<ListStoryBriefModel>>()
     lazy var topStoryModels = Array<Array<TopStoryBriefModel>>()
@@ -27,15 +27,34 @@ class StoryBriefViewModel: NSObject {
     var hasBindPreStorySignal = false
     var hasBindLatestStorySignal = false
     var hasBindDetailStorySignal = false
+    var selectedStoryId: UInt64 = 0
+    
+    lazy var detailStorySubscriber: Observer<AnyObject, NoError> = {
+        let tmpSubscriber = Observer<AnyObject, NoError>(value: { (value) in
+            print(value)
+        }, failed: nil, completed: {
+            self.selectedStoryId = 0
+        }, interrupted: nil)
+        return tmpSubscriber
+    }()
+    
+    lazy var fetchDetailStoryC: Action<UInt64, AnyObject, NSError> = {
+        
+        
+    }()
     
     func fetchDetailStoryCommand(withId: UInt64) {
-        if !hasBindDetailStorySignal {
-            let detailStorySubscriber = Observer<AnyObject, NoError>(value: { (value) in
-                print(value)
-            }, failed: nil, completed: nil, interrupted: nil)
-            storyDataUtil.detailStorySignal.observe(detailStorySubscriber);
-            hasBindDetailStorySignal = true
-        }
+//        if !hasBindDetailStorySignal {
+//            let detailStorySubscriber = Observer<AnyObject, NoError>(value: { (value) in
+//                print(value)
+//            }, failed: nil, completed: {
+//                self.selectedStoryId = withId
+//            }, interrupted: nil)
+//            storyDataUtil.detailStorySignal.observe(detailStorySubscriber);
+//            hasBindDetailStorySignal = true
+//        }
+        
+        storyDataUtil.detailStorySignal.observe(detailStorySubscriber);
         storyDataUtil.fetchDetailStoryInfo(withId: withId)
     }
     

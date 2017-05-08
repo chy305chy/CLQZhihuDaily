@@ -12,8 +12,13 @@ import ReactiveCocoa
 
 class ListStoryCell: UITableViewCell {
     
-    @IBOutlet weak var titleLabel: UITextView!
     @IBOutlet weak var storyImageView: UIImageView!
+    
+    lazy var titleLabel: ListStoryTitleTextView = {
+        let tmpTextView = ListStoryTitleTextView(frame: CGRect(x: 0, y: 0, width: 0, height: 0), textContainer: nil)
+        tmpTextView.storyCell = self
+        return tmpTextView
+    }()
     
     // 用户是否阅读过详情
     var readed: Bool! {
@@ -31,6 +36,7 @@ class ListStoryCell: UITableViewCell {
         // Initialization code
         self.selectionStyle = .none
         self.readed = false
+        self.addSubview(titleLabel)
         
         titleLabel.snp.makeConstraints { (make) in
             make.left.equalTo(self.snp.left).offset(10)
