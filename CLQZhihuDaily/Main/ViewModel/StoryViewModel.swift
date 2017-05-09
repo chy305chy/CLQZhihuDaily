@@ -20,125 +20,124 @@ class StoryViewModel: NSObject {
     lazy var sectionTitlesArray = Array<String>()
     
     let storyDataUtil = StoryDataUtil()
-    let (storySignal, storyObserver) = Signal<AnyObject, NoError>.pipe()
-    let (preStorySignal, preStoryObserver) = Signal<AnyObject, NoError>.pipe()
     
+    dynamic var storyDetailModel: StoryDetailModel?
+    dynamic var detailStoryTitleImage: UIImage?
     var preDateString: String!
     var hasBindPreStorySignal = false
     var hasBindLatestStorySignal = false
-    var hasBindDetailStorySignal = false
     var selectedStoryId: UInt64 = 0
     
-    lazy var detailStorySubscriber: Observer<AnyObject, NoError> = {
-        let tmpSubscriber = Observer<AnyObject, NoError>(value: { (value) in
-            print(value)
+    /// 获取story详情
+    private lazy var detailStorySubscriber: Observer<AnyObject, ActionError<NSError>> = {
+        return Observer<AnyObject, ActionError<NSError>>(value: {[weak self] (value) in
+            guard let strongSelf = self else { return }
+            let dict: NSDictionary = value as! NSDictionary
+            strongSelf.storyDetailModel = StoryDetailModel.detailStory(withDict: dict)
         }, failed: nil, completed: {
-            self.selectedStoryId = 0
+            
         }, interrupted: nil)
-        return tmpSubscriber
     }()
     
-    lazy var fetchDetailStoryC: Action<UInt64, AnyObject, NSError> = {
-        
-        
+    private lazy var fetchDetailStoryCommand: Action<UInt64, AnyObject, NSError> = {
+        return Action<UInt64, AnyObject, NSError> {(input: UInt64) in
+            return self.storyDataUtil.fetchDetailStoryInfo(withId: input)
+        }
     }()
     
-    func fetchDetailStoryCommand(withId: UInt64) {
-//        if !hasBindDetailStorySignal {
-//            let detailStorySubscriber = Observer<AnyObject, NoError>(value: { (value) in
-//                print(value)
-//            }, failed: nil, completed: {
-//                self.selectedStoryId = withId
-//            }, interrupted: nil)
-//            storyDataUtil.detailStorySignal.observe(detailStorySubscriber);
-//            hasBindDetailStorySignal = true
-//        }
-        
-        storyDataUtil.detailStorySignal.observe(detailStorySubscriber);
-        storyDataUtil.fetchDetailStoryInfo(withId: withId)
+    func fetchDetailStory(withId: UInt64) {
+        self.fetchDetailStoryCommand.apply(withId).start(self.detailStorySubscriber)
     }
     
     /// 获取最新的story
-    func fetchLatestStoriesCommand() {
-        /* 订阅信号 */
-        if !hasBindLatestStorySignal {
-            let listStorySubscriber = Observer<AnyObject, NoError>(value: { (value) in
-                let dict = value as! NSDictionary
-                let storiesArray = dict.object(forKey: "stories") as! NSArray
-                let topStoriesArray = dict.object(forKey: "top_stories") as! NSArray
-                let latestDate = dict.object(forKey: "date") as! String
-                /* 临时变量 */
-                var listModelsArray = Array<ListStoryBriefModel>()
-                var topModelsArray = Array<TopStoryBriefModel>()
-                
-                for storyDict in storiesArray {
-                    let tmpDict = storyDict as! NSDictionary
-                    let listStoryModel = ListStoryBriefModel(withDict: tmpDict)
-                    listModelsArray.append(listStoryModel)
-                }
-                
-                for topStoryDict in topStoriesArray {
-                    let tmpDict = topStoryDict as! NSDictionary
-                    let topStoryModel = TopStoryBriefModel(withDict: tmpDict)
-                    topModelsArray.append(topStoryModel)
-                    self.topStoryImageUrls.append(topStoryModel.image)
-                    self.topStoryImageTitles.append(topStoryModel.title)
-                }
-                
-                self.datesArray.append(latestDate)
-                self.sectionTitlesArray.append("")
-                self.listStoryModels.append(listModelsArray)
-                self.topStoryModels.append(topModelsArray)
-                
-                self.storyObserver.send(value: "success" as AnyObject)
-                //            self.storyObserver.sendCompleted()
-            }, failed: nil, completed: nil, interrupted: nil)
+    private lazy var latestStoriesSubscriber: Observer<AnyObject, ActionError<NSError>> = {
+        return Observer<AnyObject, ActionError<NSError>>(value: {[weak self] (value) in
+            guard let strongSelf = self else { return }
+            let dict = value as! NSDictionary
+            let storiesArray = dict.object(forKey: "stories") as! NSArray
+            let topStoriesArray = dict.object(forKey: "top_stories") as! NSArray
+            let latestDate = dict.object(forKey: "date") as! String
+            /* 临时变量 */
+            var listModelsArray = Array<ListStoryBriefModel>()
+            var topModelsArray = Array<TopStoryBriefModel>()
             
-            storyDataUtil.latestStorySignal.observe(listStorySubscriber)
-            hasBindLatestStorySignal = true
+            for storyDict in storiesArray {
+                let tmpDict = storyDict as! NSDictionary
+                let listStoryModel = ListStoryBriefModel(withDict: tmpDict)
+                listModelsArray.append(listStoryModel)
+            }
+            
+            for topStoryDict in topStoriesArray {
+                let tmpDict = topStoryDict as! NSDictionary
+                let topStoryModel = TopStoryBriefModel(withDict: tmpDict)
+                topModelsArray.append(topStoryModel)
+                strongSelf.topStoryImageUrls.append(topStoryModel.image)
+                strongSelf.topStoryImageTitles.append(topStoryModel.title)
+            }
+            
+            strongSelf.datesArray.append(latestDate)
+            strongSelf.sectionTitlesArray.append("")
+            strongSelf.listStoryModels.append(listModelsArray)
+            strongSelf.topStoryModels.append(topModelsArray)
+            
+            NotificationCenter.default.post(Notification(name: Notification.Name(rawValue: Common.NOTIFICATION_FETCH_LATEST_STORIES_COMPLETE)))
+        })
+    }()
+    
+    private lazy var fetchLatestStoriesCommand: Action<AnyObject, AnyObject, NSError> = {
+        return Action<AnyObject, AnyObject, NSError>{(input: AnyObject) in
+            return self.storyDataUtil.fetchLatestStories();
         }
-        
-        storyDataUtil.fetchLatestStories()
+    }()
+    
+    func fetchLatestStories() {
+        self.fetchLatestStoriesCommand.apply(NSNull()).start(self.latestStoriesSubscriber)
     }
     
-    func fetchPreviousStoryCommand() {
-        self.preDateString = self.previousDate()
-        
-        /* 确保下面代码在对象的生命周期中只执行一次 */
-        if !hasBindPreStorySignal {
-            let previousStorySubscriber = Observer<AnyObject, NoError>(value: { (value) in
-                /* 1、先添加日期 */
-                self.datesArray.append(self.preDateString)
-                self.sectionTitlesArray.append(self.weekDateString(withDate: self.preDateString))
-                
-                /* 2、解析数据 */
-                let dict = value as! NSDictionary
-                let storiesArray = dict.object(forKey: "stories") as! NSArray
-                
-                /* 临时变量 */
-                var listModelsArray = Array<ListStoryBriefModel>()
-                for storyDict in storiesArray {
-                    let tmpDict = storyDict as! NSDictionary
-                    let listStoryModel = ListStoryBriefModel(withDict: tmpDict)
-                    listModelsArray.append(listStoryModel)
-                }
-                
-                self.listStoryModels.append(listModelsArray)
-                self.preStoryObserver.send(value: true as AnyObject)
-            }, failed: nil, completed: nil, interrupted: nil)
+    /// 获取往期的story
+    private lazy var previousStorySubscriber: Observer<AnyObject, ActionError<NSError>> = {
+        return Observer<AnyObject, ActionError<NSError>>( value: {[weak self] (value) in
+            guard let strongSelf = self else { return }
+            /* 1、先添加日期 */
+            strongSelf.datesArray.append(strongSelf.preDateString)
+            strongSelf.sectionTitlesArray.append(strongSelf.weekDateString(withDate: strongSelf.preDateString))
             
-            storyDataUtil.previousStorySignal.observe(previousStorySubscriber)
+            /* 2、解析数据 */
+            let dict = value as! NSDictionary
+            let storiesArray = dict.object(forKey: "stories") as! NSArray
             
-            self.hasBindPreStorySignal = true
+            /* 临时变量 */
+            var listModelsArray = Array<ListStoryBriefModel>()
+            for storyDict in storiesArray {
+                let tmpDict = storyDict as! NSDictionary
+                let listStoryModel = ListStoryBriefModel(withDict: tmpDict)
+                listModelsArray.append(listStoryModel)
+            }
+            
+            strongSelf.listStoryModels.append(listModelsArray)
+            
+            NotificationCenter.default.post(Notification(name: Notification.Name(rawValue: Common.NOTIFICATION_FETCH_PREVIOUS_STORIES_COMPLETE)))
+
+            }, failed: nil, completed: {
+                
+        }, interrupted: nil)
+    }()
+    
+    private lazy var fetchPreviousStoryCommand: Action<String, AnyObject, NSError> = {
+        return Action<String, AnyObject, NSError> { (input: String) in
+            return self.storyDataUtil.fetchStories(beforeDate: input)
         }
-        
-        storyDataUtil.fetchStory(beforeDate: preDateString)
+    }()
+    
+    func fetchPreviousStories() {
+        self.preDateString = self.previousDate()
+        self.fetchPreviousStoryCommand.apply(self.preDateString).start(self.previousStorySubscriber)
     }
     
     /// 获取在self.datesArray数组中最后一个元素之前的日期string
     ///
     /// - Returns: 格式：20170318
-    func previousDate() -> String {
+    private func previousDate() -> String {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "YYYYMMdd"
         let latestDate = dateFormatter.date(from: self.datesArray.last!)
@@ -152,7 +151,7 @@ class StoryViewModel: NSObject {
     ///
     /// - Parameter withDate: 20170309
     /// - Returns: 03月09日星期X
-    func weekDateString(withDate: String) -> String {
+    private func weekDateString(withDate: String) -> String {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "YYYYMMdd"
         dateFormatter.locale = Locale(identifier: "zh_Hans_CN")
@@ -194,4 +193,21 @@ class StoryViewModel: NSObject {
         return weekDateString
     }
     
+    // 获取story详情页顶部的titleImage
+    private lazy var detailStoryTitleImageSubscriber: Observer<UIImage, ActionError<NSError>> = {
+        return Observer<UIImage, ActionError<NSError>>(value: { [weak self] (value) in
+            guard let strongSelf = self else { return }
+            strongSelf.detailStoryTitleImage = value
+        }, failed: nil, completed: nil, interrupted: nil)
+    }()
+    
+    private lazy var detailStoryTitleImageCommand: Action<String, UIImage, NSError> = {
+        return Action<String, UIImage, NSError> { (input: String) in
+            return self.storyDataUtil.fetchDetailStoryTitleImage(withUrl: input)
+        }
+    }()
+    
+    func fetchStoryDetailTitleImage(withUrl: String) {
+        self.detailStoryTitleImageCommand.apply(withUrl).start(self.detailStoryTitleImageSubscriber)
+    }
 }

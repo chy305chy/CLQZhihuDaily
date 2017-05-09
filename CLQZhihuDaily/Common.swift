@@ -15,6 +15,8 @@ struct Common {
     static let rootViewController = UIApplication.shared.keyWindow?.rootViewController as! ViewController
     /// 侧边栏的宽度
     static let leftViewWidth: CGFloat = 200.0
+    static let TABLEVIEW_HEADER_VIEW_HEIGHT = 44
+    static let TABLEVIEW_ROW_HEIGHT = 90
     
     static let GLOBAL_COLOR_BLUE = UIColor(red: 1/255.0, green: 131/255.0, blue: 209/255.0, alpha: 1)
     
@@ -28,6 +30,8 @@ struct Common {
     static let START_IMAGE_FILE_NAME = "startImage.plist"
     static let START_IMAGE_FILE_KEY = "startImageFileKey"
     
-    static let TABLEVIEW_HEADER_VIEW_HEIGHT = 44
-    static let TABLEVIEW_ROW_HEIGHT = 90
+    /// 获取最新的stories complete
+    static let NOTIFICATION_FETCH_LATEST_STORIES_COMPLETE = "NOTIFICATION_FETCH_LATEST_STORIES_COMPLETE"
+    /// 获取往期的stories complete
+    static let NOTIFICATION_FETCH_PREVIOUS_STORIES_COMPLETE = "NOTIFICATION_FETCH_PREVIOUS_STORIES_COMPLETE"
 }

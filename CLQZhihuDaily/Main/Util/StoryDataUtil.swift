@@ -12,23 +12,21 @@ import Result
 import Alamofire
 
 class StoryDataUtil: NSObject {
-    // 最新story，通过管道创建热信号
-    let (latestStorySignal, latestStoryObserver) = Signal<AnyObject, NoError>.pipe()
-    // 之前的story
-    let (previousStorySignal, previousStoryObserver) = Signal<AnyObject, NoError>.pipe()
-    // story详情
-    let (detailStorySignal, detailStoryObserver) = Signal<AnyObject, NoError>.pipe()
-    
+
     /// 获取最新story
-    func fetchLatestStories() {
-        Alamofire.request(Common.API_URL_NEWS_LATEST, method: .get, parameters: nil, encoding: JSONEncoding.default, headers: nil).responseJSON { (response) in
-            switch(response.result) {
-            case .success:
-                self.latestStoryObserver.send(value: response.result.value as AnyObject)
-                break
-            case .failure(_):
-                print("获取最新story失败！")
-                break
+    func fetchLatestStories() -> SignalProducer<AnyObject, NSError> {
+        return SignalProducer<AnyObject, NSError> { (observer, _) in
+            Alamofire.request(Common.API_URL_NEWS_LATEST, method: .get, parameters: nil, encoding: JSONEncoding.default, headers: nil).responseJSON { (response) in
+                switch(response.result) {
+                case .success:
+                    observer.send(value: response.result.value as AnyObject)
+                    observer.sendCompleted()
+                    break
+                case .failure(let error):
+                    print("获取最新story失败！：%@", error)
+                    observer.send(error: error as NSError)
+                    break
+                }
             }
         }
     }
@@ -36,38 +34,65 @@ class StoryDataUtil: NSObject {
     /// 获取指定日期之前的story
     ///
     /// - Parameter beforeDate: 指定的日期，格式：20170217
-    func fetchStory(beforeDate: String) {
-        let url = Common.API_URL_NEWS_BEFORE.appending(beforeDate)
-        Alamofire.request(url, method: .get, parameters: nil, encoding: JSONEncoding.default, headers: nil).responseJSON { (response) in
-            switch(response.result) {
-            case .success:
-                self.previousStoryObserver.send(value: response.result.value as AnyObject)
-                break
-            case .failure(_):
-                print("获取往期story数据失败！")
-                break
+    func fetchStories(beforeDate: String) -> SignalProducer<AnyObject, NSError> {
+        return SignalProducer<AnyObject, NSError>({ (observer, _) in
+            let url = Common.API_URL_NEWS_BEFORE.appending(beforeDate)
+            Alamofire.request(url, method: .get, parameters: nil, encoding: JSONEncoding.default, headers: nil).responseJSON { (response) in
+                switch(response.result) {
+                case .success:
+                    observer.send(value: response.result.value as AnyObject)
+                    observer.sendCompleted()
+                    break
+                case .failure(let error):
+                    print("获取往期story数据失败！:%@", error)
+                    observer.send(error: error as NSError)
+                    break
+                }
             }
-        }
+
+        })
     }
     
     /// 获取story详情数据
     ///
     /// - Parameter withId: storyId
-    func fetchDetailStoryInfo(withId: UInt64) {
-        let url = String(format: "%@%lu", Common.API_URL, withId)
-        Alamofire.request(url, method: .get, parameters: nil, encoding: JSONEncoding.default, headers: nil).responseJSON { (response) in
-            switch(response.result) {
-            case .success:
-                self.detailStoryObserver.send(value: response.result.value as AnyObject)
-                self.detailStoryObserver.sendCompleted()
-                break
-            case .failure(let error):
-                print("获取story详情数据失败！")
-                self.detailStoryObserver.send(error: error as! NoError)
-                break
+    func fetchDetailStoryInfo(withId: UInt64) -> SignalProducer<AnyObject, NSError> {
+        return SignalProducer<AnyObject, NSError> { observer, _ in
+            let url = String(format: "%@%lu", Common.API_URL, withId)
+            Alamofire.request(url, method: .get, parameters: nil, encoding: JSONEncoding.default, headers: nil).responseJSON { (response) in
+                switch(response.result) {
+                case .success:
+                    observer.send(value: response.result.value as AnyObject)
+                    observer.sendCompleted()
+                    break
+                case .failure(let error):
+                    print("获取story详情数据失败！: %@", error)
+                    observer.send(error: error as NSError)
+                    break
+                }
             }
         }
-        
     }
     
+    /// 获取story详情页的顶部标题图片
+    ///
+    /// - Parameter withUrl: 图片url地址
+    /// - Returns: SignalProducer
+    func fetchDetailStoryTitleImage(withUrl: String) -> SignalProducer<UIImage, NSError> {
+        return SignalProducer<UIImage, NSError>({ (observer, _) in
+            Alamofire.request(withUrl, method: .get, parameters: nil, encoding: URLEncoding.default, headers: nil).responseData(completionHandler: { (response) in
+                switch(response.result) {
+                case .success:
+                    let image: UIImage = UIImage(data: response.result.value!)!
+                    observer.send(value: image)
+                    observer.sendCompleted()
+                    break
+                case .failure(let error):
+                    print("获取story详情标题图片失败！: %@", error)
+                    observer.send(error: error as NSError)
+                    break
+                }
+            })
+        })
+    }
 }

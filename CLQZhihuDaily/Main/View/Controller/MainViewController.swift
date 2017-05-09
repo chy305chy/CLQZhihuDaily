@@ -29,7 +29,7 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
     var navTitleLabel: UILabel!
     // 顶部轮播图片view
     var cyclePictureView: CyclePictureView!
-    var storyBriefViewModel: StoryViewModel!
+    var storyViewModel: StoryViewModel!
     /* 判断下拉是否完成并进入刷新状态 */
     var refreshTrigger: Bool!
     
@@ -82,7 +82,7 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
         pullDistance = UIApplication.shared.statusBarFrame.size.height + (self.navigationController?.navigationBar.frame.size.height)!
         
         self.view.backgroundColor = UIColor.gray;
-        storyBriefViewModel = StoryViewModel()
+        storyViewModel = StoryViewModel()
         
         self.storyTableView.register(UINib(nibName: "ListStoryCell", bundle: nil), forCellReuseIdentifier: "storyCell")
         self.storyTableView.frame = CGRect(x: 0, y: 0, width: self.view.frame.size.width, height: self.view.frame.size.height)
@@ -98,21 +98,28 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
         
         setUpCycleImageScrollView()
         
-        let storySubscriber = Observer<AnyObject, NoError>(value: { (_) in
-            self.cyclePictureView.imageURLArray = self.storyBriefViewModel.topStoryImageUrls
-            self.cyclePictureView.imageTitleArray = self.storyBriefViewModel.topStoryImageTitles
-            self.storyTableView.reloadData()
-        }, failed: nil, completed: nil, interrupted: nil)
-        storyBriefViewModel.storySignal.observe(storySubscriber)
-        storyBriefViewModel.fetchLatestStoriesCommand()
+        storyViewModel.fetchLatestStories()
         
-        let preStorySubscriber = Observer<AnyObject, NoError>(value: { (value) in
-            if value.boolValue! {
-                self.isLoadingPreviousData = false
-                self.storyTableView.reloadData()
-            }
-        }, failed: nil, completed: nil, interrupted: nil)
-        storyBriefViewModel.preStorySignal.observe(preStorySubscriber)
+        NotificationCenter.default.addObserver(self, selector: #selector(fetchLatestStoriesCompletionHandler), name: NSNotification.Name(rawValue: Common.NOTIFICATION_FETCH_LATEST_STORIES_COMPLETE), object: nil)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(fetchPreviousStoriesCompletionHandler), name: NSNotification.Name(rawValue: Common.NOTIFICATION_FETCH_PREVIOUS_STORIES_COMPLETE), object: nil)
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        self.navigationController?.navigationBar.isHidden = false
+    }
+    
+    func fetchLatestStoriesCompletionHandler() {
+        self.cyclePictureView.imageURLArray = self.storyViewModel.topStoryImageUrls
+        self.cyclePictureView.imageTitleArray = self.storyViewModel.topStoryImageTitles
+        self.storyTableView.reloadData()
+    }
+    
+    func fetchPreviousStoriesCompletionHandler() {
+        self.isLoadingPreviousData = false
+        self.storyTableView.reloadData()
     }
     
     /// 设置tableView顶部的轮播图片
@@ -122,8 +129,9 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
         cyclePictureView.currentDotColor = UIColor.white
         cyclePictureView.otherDotColor = UIColor.lightGray
         cyclePictureView.timeInterval = 3.5
-        cyclePictureView.pictureContentMode = UIViewContentMode.scaleAspectFill
+        cyclePictureView.pictureContentMode = .scaleAspectFill
         self.storyTableView.tableHeaderView = cyclePictureView
+//        self.view.addSubview(cyclePictureView)
     }
     
     /// 设置navBar透明
@@ -133,7 +141,7 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        return storyBriefViewModel.listStoryModels.count
+        return storyViewModel.listStoryModels.count
     }
     
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
@@ -145,13 +153,13 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let sectionHeaderView = SectionHeaderView()
-        sectionHeaderView.titleLabel.text = storyBriefViewModel.sectionTitlesArray[section]
+        sectionHeaderView.titleLabel.text = storyViewModel.sectionTitlesArray[section]
         
         return sectionHeaderView
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return storyBriefViewModel.listStoryModels[section].count
+        return storyViewModel.listStoryModels[section].count
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -161,18 +169,22 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "storyCell", for: indexPath) as! ListStoryCell
         
-        cell.titleLabel.text = storyBriefViewModel.listStoryModels[indexPath.section][indexPath.row].title
-        let imgUrl = (storyBriefViewModel.listStoryModels[indexPath.section][indexPath.row].images).object(at: 0) as! String
+        cell.titleLabel.text = storyViewModel.listStoryModels[indexPath.section][indexPath.row].title
+        let imgUrl = (storyViewModel.listStoryModels[indexPath.section][indexPath.row].images).object(at: 0) as! String
         cell.storyImageView.sd_setImage(with: URL(string: imgUrl))
 
         return cell
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let model = storyBriefViewModel.listStoryModels[indexPath.section][indexPath.row]
+        let model = storyViewModel.listStoryModels[indexPath.section][indexPath.row]
         DispatchQueue.main.async {
             self.fetchDetailStoryData(withId: model.storyId)
         }
+        
+        let storyDetailVC = StoryDetailViewController()
+        storyDetailVC.storyViewModel = storyViewModel
+        self.navigationController?.pushViewController(storyDetailVC, animated: true)
     }
     
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
@@ -247,11 +259,19 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
     /// 获取往期数据
     func loadPreviousData() {
         self.isLoadingPreviousData = true
-        storyBriefViewModel.fetchPreviousStoryCommand()
+        storyViewModel.fetchPreviousStories()
     }
     
     func fetchDetailStoryData(withId: UInt64) {
-        storyBriefViewModel.fetchDetailStoryCommand(withId: withId)
+        storyViewModel.fetchDetailStory(withId: withId)
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
 
+//    override var prefersStatusBarHidden: Bool {
+//        return false
+//    }
+    
 }
