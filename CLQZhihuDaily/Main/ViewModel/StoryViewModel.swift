@@ -24,6 +24,7 @@ class StoryViewModel: NSObject {
     dynamic var storyDetailModel: StoryDetailModel?
     dynamic var detailStoryTitleImage: UIImage?
     var preDateString: String!
+    var selectedIndexPath: IndexPath?       // 选中cell的indexPath
     var hasBindPreStorySignal = false
     var hasBindLatestStorySignal = false
     var selectedStoryId: UInt64 = 0
@@ -71,14 +72,35 @@ class StoryViewModel: NSObject {
                 let tmpDict = topStoryDict as! NSDictionary
                 let topStoryModel = TopStoryBriefModel(withDict: tmpDict)
                 topModelsArray.append(topStoryModel)
-                strongSelf.topStoryImageUrls.append(topStoryModel.image)
-                strongSelf.topStoryImageTitles.append(topStoryModel.title)
             }
             
-            strongSelf.datesArray.append(latestDate)
-            strongSelf.sectionTitlesArray.append("")
-            strongSelf.listStoryModels.append(listModelsArray)
-            strongSelf.topStoryModels.append(topModelsArray)
+            if strongSelf.listStoryModels.count != 0 {
+                // 下拉加载最新(非第一次加载)
+                // 增量添加
+                let topStoryDelta = topModelsArray.count - strongSelf.topStoryModels[0].count
+                let listStoryDelta = listModelsArray.count - strongSelf.listStoryModels[0].count
+                
+                for i in (0 ..< topStoryDelta).reversed() {
+                    strongSelf.topStoryImageUrls.insert(topModelsArray[i].image, at: 0)
+                    strongSelf.topStoryImageTitles.insert(topModelsArray[i].title, at: 0)
+                    strongSelf.topStoryModels[0].insert(topModelsArray[i], at: 0)
+                }
+                
+                for i in (0 ..< listStoryDelta).reversed() {
+                    strongSelf.listStoryModels[0].insert(listModelsArray[i], at: 0)
+                }
+            }else {
+                for topStoryDict in topStoriesArray {
+                    let tmpDict = topStoryDict as! NSDictionary
+                    let topStoryModel = TopStoryBriefModel(withDict: tmpDict)
+                    strongSelf.topStoryImageUrls.append(topStoryModel.image)
+                    strongSelf.topStoryImageTitles.append(topStoryModel.title)
+                }
+                strongSelf.datesArray.append(latestDate)
+                strongSelf.sectionTitlesArray.append("")
+                strongSelf.listStoryModels.append(listModelsArray)
+                strongSelf.topStoryModels.append(topModelsArray)
+            }
             
             NotificationCenter.default.post(Notification(name: Notification.Name(rawValue: Common.NOTIFICATION_FETCH_LATEST_STORIES_COMPLETE)))
         })

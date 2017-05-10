@@ -122,9 +122,7 @@ class StoryDetailViewController: UIViewController, UIScrollViewDelegate {
         DynamicProperty<UIImage>(object: self.storyViewModel!, keyPath: "detailStoryTitleImage").producer.startWithSignal { (observer, disposable) in
             observer.observeValues({[weak self] (value) in
                 guard let strongSelf = self else { return }
-                if value != nil {
-                    strongSelf.titleImageView.image = value
-                }
+                strongSelf.titleImageView.image = value
             })
         }
     }
@@ -178,6 +176,8 @@ class StoryDetailViewController: UIViewController, UIScrollViewDelegate {
 //    }
     
     deinit {
+        self.storyViewModel?.detailStoryTitleImage = nil
+        self.storyViewModel?.storyDetailModel = nil
         print("StoryDetailViewController销毁了")
     }
 

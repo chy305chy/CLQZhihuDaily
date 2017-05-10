@@ -114,6 +114,11 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
         self.cyclePictureView.imageURLArray = self.storyViewModel.topStoryImageUrls
         self.cyclePictureView.imageTitleArray = self.storyViewModel.topStoryImageTitles
         self.storyTableView.reloadData()
+        
+        self.loadCircleAnimatedView.updateCircle(byRatio: 0)
+        self.refreshTrigger = false
+        self.loadingActivityView.stopAnimating()
+        self.storyTableView.contentOffset.y = self.pullDistance
     }
     
     func fetchPreviousStoriesCompletionHandler() {
@@ -170,6 +175,7 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
         let cell = tableView.dequeueReusableCell(withIdentifier: "storyCell", for: indexPath) as! ListStoryCell
         
         cell.titleLabel.text = storyViewModel.listStoryModels[indexPath.section][indexPath.row].title
+        cell.readed = storyViewModel.listStoryModels[indexPath.section][indexPath.row].readed
         let imgUrl = (storyViewModel.listStoryModels[indexPath.section][indexPath.row].images).object(at: 0) as! String
         cell.storyImageView.sd_setImage(with: URL(string: imgUrl))
 
@@ -177,10 +183,14 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        storyViewModel.selectedIndexPath = indexPath
+        
         let model = storyViewModel.listStoryModels[indexPath.section][indexPath.row]
-        DispatchQueue.main.async {
-            self.fetchDetailStoryData(withId: model.storyId)
-        }
+        model.readed = true
+        let cell = tableView.cellForRow(at: indexPath) as! ListStoryCell
+        cell.readed = true
+        
+        self.fetchDetailStoryData(withId: model.storyId)
         
         let storyDetailVC = StoryDetailViewController()
         storyDetailVC.storyViewModel = storyViewModel
@@ -251,14 +261,8 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
         self.refreshTrigger = true
         loadingActivityView.startAnimating()
         
-        
-        
-        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + DispatchTimeInterval.milliseconds(3000), execute: {
-            print("获取到最新数据")
-            self.loadCircleAnimatedView.updateCircle(byRatio: 0)
-            self.refreshTrigger = false
-            self.loadingActivityView.stopAnimating()
-            self.storyTableView.contentOffset.y = self.pullDistance
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + DispatchTimeInterval.milliseconds(500), execute: {
+            self.storyViewModel.fetchLatestStories()
         })
     }
     
