@@ -47,10 +47,6 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
         return tmpTableView;
     }()
     
-    override var preferredStatusBarStyle: UIStatusBarStyle {
-        return .lightContent
-    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -109,6 +105,9 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
         super.viewWillAppear(animated)
         
         self.navigationController?.navigationBar.isHidden = false
+        
+        UIApplication.shared.statusBarStyle = .lightContent
+        self.setStatusBarBackgroundColor(color: UIColor.clear)
     }
     
     func fetchLatestStoriesCompletionHandler() {
@@ -124,14 +123,15 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     /// 设置tableView顶部的轮播图片
     func setUpCycleImageScrollView() {
-        cyclePictureView = CyclePictureView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: topScrollViewHeight+pullDistance), imageURLArray: nil)
+        let cyclePictureContainerView = UIView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: topScrollViewHeight+pullDistance))
+        cyclePictureView = CyclePictureView(frame: CGRect(x: 0, y: pullDistance, width: self.view.frame.width, height: topScrollViewHeight), imageURLArray: nil)
         cyclePictureView.backgroundColor = UIColor.red
         cyclePictureView.currentDotColor = UIColor.white
         cyclePictureView.otherDotColor = UIColor.lightGray
         cyclePictureView.timeInterval = 3.5
         cyclePictureView.pictureContentMode = .scaleAspectFill
-        self.storyTableView.tableHeaderView = cyclePictureView
-//        self.view.addSubview(cyclePictureView)
+        cyclePictureContainerView.addSubview(cyclePictureView)
+        self.storyTableView.tableHeaderView = cyclePictureContainerView
     }
     
     /// 设置navBar透明
@@ -209,6 +209,11 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
                     offset.y = 0
                     scrollView.contentOffset = offset;
                 }
+                
+                var frame = cyclePictureView.frame
+                frame.origin.y = offsetY
+                frame.size.height = topScrollViewHeight + (pullDistance - offsetY)
+                cyclePictureView.frame = frame
             }else {
                 self.loadCircleAnimatedView.isHidden = true
             }
@@ -217,6 +222,7 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
                 /* NavBar透明度渐变 */
                 let alpha = min(1, (offsetY - (self.pullDistance + 20)) / ((self.pullDistance + 20) + prelude))
                 self.navigationController?.navigationBar.clq_setBackgroundColor(backgroundColor: Common.GLOBAL_COLOR_BLUE.withAlphaComponent(alpha))
+                
                 
                 /* 获取往期的story */
                 if offsetY > scrollView.contentSize.height - self.view.bounds.size.height - 2*self.cellHeight {
@@ -266,12 +272,18 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
         storyViewModel.fetchDetailStory(withId: withId)
     }
     
+    func setStatusBarBackgroundColor(color: UIColor) {
+        let statusBar: UIView = UIApplication.shared.value(forKey: "statusBar") as! UIView
+        
+        if statusBar.responds(to: #selector(setter: UIView.backgroundColor)) {
+            UIView.animate(withDuration: 0.2, animations: {
+                statusBar.backgroundColor = color
+            })
+        }
+    }
+    
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
-
-//    override var prefersStatusBarHidden: Bool {
-//        return false
-//    }
     
 }

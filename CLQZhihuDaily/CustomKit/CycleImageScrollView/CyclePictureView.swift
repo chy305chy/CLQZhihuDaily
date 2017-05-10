@@ -362,6 +362,7 @@ extension CyclePictureView {
             }
             
         }
+        
         return cell
     }
     

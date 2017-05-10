@@ -10,17 +10,54 @@ import UIKit
 import ReactiveSwift
 import ReactiveCocoa
 import Result
+import SnapKit
 
 class StoryDetailViewController: UIViewController, UIScrollViewDelegate {
     
     let scrollViewOffsetTop: CGFloat = 84.0
     var titleImageViewOriginalHeight: CGFloat = 0.0
+    let titleLabelLeftMargin: CGFloat = 20.0   // 主标题label与父视图左右边界的间距
+    let labelGap: CGFloat = 10.0               // 主标题label与副标题label的间距
+    let titleLabelHeight: CGFloat = 53.0       // 主标题label的高度
+    let subtitleLabelHeight: CGFloat = 12.0    // 副标题label的高度
+    
+    lazy var gradientView: GradientView = {
+        let tmpView: GradientView = GradientView(frame: CGRect(x: 0, y: 0, width: self.view.frame.size.width, height: 0))
+        
+        return tmpView
+    }()
+    
+    lazy var storyTitleLabel: UILabel = {
+        let tmpLabel = UILabel()
+        tmpLabel.font = UIFont.boldSystemFont(ofSize: 21.0)
+        tmpLabel.textColor = UIColor.white
+        tmpLabel.textAlignment = .left
+        tmpLabel.numberOfLines = 2
+        tmpLabel.lineBreakMode = .byWordWrapping
+//        tmpLabel.text = "我是测试测试标题，哈哈哈哈哈哈哈哈"
+        
+        return tmpLabel
+    }()
+    
+    lazy var storySubtitleLabel: UILabel = {
+        let tmpLabel = UILabel()
+        tmpLabel.font = UIFont.systemFont(ofSize: 10.0)
+        tmpLabel.textColor = UIColor(colorLiteralRed: 200.0/255.0, green: 200.0/255.0, blue: 200.0/255.0, alpha: 1.0)
+        tmpLabel.textAlignment = .right
+//        tmpLabel.text = "图片：《名侦探柯南》"
+        
+        return tmpLabel
+    }()
     
     lazy var titleImageView: UIImageView = {
         let tmpImgV: UIImageView = UIImageView(frame: CGRect.init(x: 0, y: self.scrollViewOffsetTop, width: self.view.frame.size.width, height: 100))
-        tmpImgV.backgroundColor = UIColor.blue
+        tmpImgV.backgroundColor = UIColor.white
         tmpImgV.contentMode = .scaleAspectFill
         tmpImgV.layer.masksToBounds = true
+        tmpImgV.addSubview(self.gradientView)
+        tmpImgV.addSubview(self.storyTitleLabel)
+        tmpImgV.addSubview(self.storySubtitleLabel)
+        
         return tmpImgV
     }()
     
@@ -64,6 +101,16 @@ class StoryDetailViewController: UIViewController, UIScrollViewDelegate {
                         frame.size.height = strongSelf.titleImageViewOriginalHeight
                         strongSelf.titleImageView.frame = frame
                         strongSelf.storyDetailView.scrollView.addSubview(strongSelf.titleImageView);
+                        
+                        var frame2 = strongSelf.gradientView.frame
+                        frame2.size.height = CGFloat(bodyPadding) + 205
+                        strongSelf.gradientView.frame = frame2
+                        
+                        strongSelf.storyTitleLabel.frame = CGRect(x: strongSelf.titleLabelLeftMargin, y: strongSelf.titleImageView.frame.size.height - strongSelf.titleLabelHeight - 2*strongSelf.labelGap-strongSelf.subtitleLabelHeight, width: strongSelf.titleImageView.frame.size.width - 3*strongSelf.titleLabelLeftMargin, height: strongSelf.titleLabelHeight)
+                        strongSelf.storySubtitleLabel.frame = CGRect(x: strongSelf.titleLabelLeftMargin, y: strongSelf.titleImageView.frame.size.height - strongSelf.labelGap - strongSelf.subtitleLabelHeight, width: strongSelf.titleImageView.frame.size.width - 2*strongSelf.titleLabelLeftMargin, height: strongSelf.subtitleLabelHeight)
+                        
+                        strongSelf.storyTitleLabel.text = model.title
+                        strongSelf.storySubtitleLabel.text = "图片：".appending(model.imageSource)
                     }catch {
                         print(error)
                     }
@@ -89,20 +136,45 @@ class StoryDetailViewController: UIViewController, UIScrollViewDelegate {
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let offsetY = scrollView.contentOffset.y
+        
         if offsetY <= 0 {
             scrollView.contentOffset = CGPoint(x: 0, y: 0)
         }
         
-        var frame = self.titleImageView.frame
-        frame.origin.y = offsetY
-        frame.size.height = self.titleImageViewOriginalHeight + (self.scrollViewOffsetTop - offsetY)
-        self.titleImageView.frame = frame
+        if offsetY <= scrollViewOffsetTop && offsetY >= 0 {
+            var frame = self.titleImageView.frame
+            frame.origin.y = offsetY
+            frame.size.height = self.titleImageViewOriginalHeight + (self.scrollViewOffsetTop - offsetY)
+            self.titleImageView.frame = frame
+            self.storyTitleLabel.frame = CGRect(x: titleLabelLeftMargin, y: self.titleImageView.frame.size.height - titleLabelHeight - 2*labelGap-subtitleLabelHeight, width: self.titleImageView.frame.size.width - 3*titleLabelLeftMargin, height: titleLabelHeight)
+            self.storySubtitleLabel.frame = CGRect(x: self.titleLabelLeftMargin, y: self.titleImageView.frame.size.height - self.labelGap - self.subtitleLabelHeight, width: self.titleImageView.frame.size.width - 2*self.titleLabelLeftMargin, height: self.subtitleLabelHeight)
+        }
         
-        print("%f", offsetY)
+        // 向上滑动到一定距离时，改变statusBar的透明度
+        if offsetY >= self.titleImageViewOriginalHeight + self.scrollViewOffsetTop - 20 {
+            self.setStatusBarBackgroundColor(color: UIColor.white)
+            UIApplication.shared.statusBarStyle = .default
+        }else {
+            self.setStatusBarBackgroundColor(color: UIColor.clear)
+            UIApplication.shared.statusBarStyle = .lightContent
+        }
     }
 
-//    override var prefersStatusBarHidden: Bool {
-//        return true
+    func setStatusBarBackgroundColor(color: UIColor) {
+        let statusBar: UIView = UIApplication.shared.value(forKey: "statusBar") as! UIView
+        
+        if statusBar.responds(to: #selector(setter: UIView.backgroundColor)) {
+            UIView.animate(withDuration: 0.2, animations: {
+                statusBar.backgroundColor = color
+            })
+        }
+    }
+    
+//    override var preferredStatusBarStyle: UIStatusBarStyle {
+//        if self.isStatusBarLightContent {
+//            return .lightContent
+//        }
+//        return .default
 //    }
     
     deinit {

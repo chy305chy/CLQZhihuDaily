@@ -73,6 +73,10 @@ class LoadingViewController: UIViewController {
             make.bottom.equalTo(logoImageView.snp.top).offset(-15)
         }
     }
+    
+//    override var preferredStatusBarStyle: UIStatusBarStyle {
+//        return .lightContent
+//    }
 
     /*
     // MARK: - Navigation

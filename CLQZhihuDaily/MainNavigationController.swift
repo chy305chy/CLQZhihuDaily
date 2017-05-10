@@ -41,6 +41,14 @@ class MainNavigationController: UINavigationController {
         self.navigationBar.setBackgroundImage(image, for: .default)
     }
     
+//    override var childViewControllerForStatusBarStyle: UIViewController? {
+//        return self.topViewController
+//    }
+//
+//    override var preferredStatusBarStyle: UIStatusBarStyle {
+//        return .lightContent
+//    }
+    
 //    override var preferredStatusBarStyle: UIStatusBarStyle {
 //        let topVC = self.topViewController!
 //        return topVC.preferredStatusBarStyle

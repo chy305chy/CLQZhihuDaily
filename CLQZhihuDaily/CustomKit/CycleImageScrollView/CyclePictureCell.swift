@@ -12,8 +12,16 @@
  ***************************************************/
 
 import UIKit
+import ReactiveSwift
+import ReactiveCocoa
+import Result
 
 class CyclePictureCell: UICollectionViewCell {
+    
+    lazy var gradientView: GradientView = {
+        return GradientView(frame: CGRect(x: 0, y: 0, width: self.frame.size.width, height: self.frame.size.height + 64))
+
+    }()
     
     var imageSource: ImageSource = ImageSource.local(name: ""){
         didSet {
@@ -92,8 +100,7 @@ class CyclePictureCell: UICollectionViewCell {
     }
     
     fileprivate func setupDetailLable() {
-        let gradientView = GradientView(frame: CGRect(x: 0, y: 0, width: self.frame.size.width, height: self.frame.size.height))
-        gradientView.gradientLayer.colors = [UIColor.clear.cgColor, UIColor(white: 0, alpha: 0.7).cgColor]
+        self.gradientView.gradientLayer.colors = [UIColor.clear.cgColor, UIColor(white: 0, alpha: 0.7).cgColor]
         detailLable = UILabel()
         detailLable.textColor = detailLableTextColor
         detailLable.shadowColor = UIColor.gray
@@ -106,6 +113,10 @@ class CyclePictureCell: UICollectionViewCell {
         
         gradientView.addSubview(detailLable)
         self.addSubview(gradientView)
+        
+//        gradientView.snp.makeConstraints { (make) in
+//            make.edges.equalTo(self.snp.edges)
+//        }
     }
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
