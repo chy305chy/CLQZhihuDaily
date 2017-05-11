@@ -31,9 +31,9 @@ class LoadingViewController: UIViewController {
         // KVO
         DynamicProperty<UIImage>(object: LoadingViewModel.sharedLoadingViewModel, keyPath: "startImage").producer.startWithSignal { (observer, disposable) in
             observer.observeValues({ (value) in
-                if value != nil {
+                if let wrappedValue = value {
                     self.authorLabel.text = LoadingViewModel.sharedLoadingViewModel.startImageAuthor
-                    self.startImageView.image = value
+                    self.startImageView.image = wrappedValue
                     UIView.animate(withDuration: 1.5, animations: {
                         self.logoImageView.alpha = 1.0
                         self.startImageView.alpha = 1.0

@@ -16,6 +16,10 @@ import Result
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
+    
+    lazy var loadingViewModel: LoadingViewModel = {
+        return LoadingViewModel.sharedLoadingViewModel
+    }()
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
@@ -32,15 +36,23 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let startImageUtil = StartImageDataUtil()
         let startImageModel = startImageUtil.getStartImageModel()
         
-        startImageUtil.fetchStartImageUrl { (author, imgUrl) in
-            if imgUrl != startImageModel?.startImageUrl {
-                /* URL不一致时，获取新数据 */
-                LoadingViewModel.sharedLoadingViewModel.fetchStartImage(withUrl: imgUrl, author: author)
-            }else {
-                /* URL一致时，从本地文件中获取数据 */
-                LoadingViewModel.sharedLoadingViewModel.fetchStartImageFromLocal()
-            }
+        self.loadingViewModel.fetchStartImageUrl()
+        
+        DynamicProperty<String>(object: self.loadingViewModel, keyPath: "startImageUrl").producer.startWithSignal { (signal, disposable) in
+            signal.observeValues({[weak self] (value) in
+                guard let strongSelf = self else { return }
+                if let wrappedValue = value {
+                    if wrappedValue != startImageModel?.startImageUrl {
+                        /* URL不一致时，获取新数据 */
+                        strongSelf.loadingViewModel.fetchStartImage()
+                    }else {
+                        /* URL一致时，从本地文件中获取数据 */
+                        strongSelf.loadingViewModel.fetchStartImageFromLocal()
+                    }
+                }
+            })
         }
+        
     }
 
     func applicationWillResignActive(_ application: UIApplication) {

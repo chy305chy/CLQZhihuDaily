@@ -10,11 +10,7 @@ import UIKit
 
 class StoryDetailView: UIWebView {
     
-    var storyDetailModel: StoryDetailModel? {
-        didSet {
-            
-        }
-    }
+    var storyDetailModel: StoryDetailModel?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -23,6 +19,10 @@ class StoryDetailView: UIWebView {
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    deinit {
+        print("StoryDetailView销毁了");
     }
 
 }

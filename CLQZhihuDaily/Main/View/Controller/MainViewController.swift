@@ -108,6 +108,8 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
         
         UIApplication.shared.statusBarStyle = .lightContent
         self.setStatusBarBackgroundColor(color: UIColor.clear)
+        
+        self.storyTableView.reloadData()
     }
     
     func fetchLatestStoriesCompletionHandler() {

@@ -17,38 +17,61 @@ class LoadingViewModel: NSObject {
     private override init() {}
     
     dynamic var startImage: UIImage!
-    var startImageAuthor: String!
+    var startImageAuthor: String?
+    dynamic var startImageUrl: String?
     
     let startImageUtil = StartImageDataUtil()
     let startImageModel = StartImageModel()
     
-//    let (signal, observer) = Signal<AnyObject, NoError>.pipe()
+    /// 获取startImage的url
+    private lazy var startImageUrlSubscriber: Observer<Dictionary<String, String>, ActionError<NSError>> = {
+        return Observer<Dictionary<String, String>, ActionError<NSError>>(value: {[weak self] (value) in
+            guard let strongSelf = self else { return }
+            let dict: Dictionary<String, String> = value
+            
+            strongSelf.startImageAuthor = dict["author"]
+            strongSelf.startImageUrl = dict["imgUrl"]
+        }, failed: nil, completed: nil, interrupted: nil)
+    }()
+    
+    private lazy var startImageUrlCommand: Action<Any, Dictionary<String, String>, NSError> = {
+        return Action<Any, Dictionary<String, String>, NSError> {[unowned self] (input: Any) in
+            return self.startImageUtil.fetchStartImageUrl()
+        }
+    }()
+    
+    func fetchStartImageUrl() {
+        self.startImageUrlCommand.apply(NSNull()).start(self.startImageUrlSubscriber)
+    }
     
     /// 获取startImage
-    func fetchStartImage(withUrl: String, author: String) {
-        let imgSubscriber = Observer<AnyObject, NoError>(value: { (value) in
+    private lazy var startImageSubscriber: Observer<AnyObject, ActionError<NSError>> = {
+        return Observer<AnyObject, ActionError<NSError>>(value: {[weak self] (value) in
+            guard let strongSelf = self else { return }
             // startimage
             let imgData = value as! Data
             let image = UIImage(data: imgData)
             // author
-            self.startImageAuthor = author
-            self.startImage = image!
+            strongSelf.startImage = image!
             
             // 设置startimage model
-            self.startImageModel.startImageUrl = withUrl
-            self.startImageModel.startImage = image!
-            self.startImageModel.startImageAuthor = self.startImageAuthor
+            strongSelf.startImageModel.startImageUrl = strongSelf.startImageUrl
+            strongSelf.startImageModel.startImage = image!
+            strongSelf.startImageModel.startImageAuthor = strongSelf.startImageAuthor
             
             // Model归档
-            self.startImageUtil.save(startImageModel: self.startImageModel)
-            
-//            self.observer.send(value: image!)
-//            self.observer.sendCompleted()
+            strongSelf.startImageUtil.save(startImageModel: strongSelf.startImageModel)
         }, failed: nil, completed: nil, interrupted: nil)
-        
-        startImageUtil.imgSignal.observe(imgSubscriber)
-        // 调用工具类方法获取startImage
-        startImageUtil.fetchStartImage(withUrl: withUrl, author: author)
+    }()
+    
+    private lazy var startImageCommand: Action<Any, AnyObject, NSError> = {
+        return Action<Any, AnyObject, NSError> {[unowned self] (input: Any) in
+            return self.startImageUtil.fetchStartImage(withUrl: self.startImageUrl!)
+        }
+    }()
+    
+    func fetchStartImage() {
+        self.startImageCommand.apply(NSNull()).start(self.startImageSubscriber)
     }
     
     /// 从本地归档文件中获取

@@ -24,7 +24,8 @@ class StoryViewModel: NSObject {
     dynamic var storyDetailModel: StoryDetailModel?
     dynamic var detailStoryTitleImage: UIImage?
     var preDateString: String!
-    var selectedIndexPath: IndexPath?       // 选中cell的indexPath
+    // 选中cell的indexPath
+    var selectedIndexPath: IndexPath!
     var hasBindPreStorySignal = false
     var hasBindLatestStorySignal = false
     var selectedStoryId: UInt64 = 0
@@ -41,7 +42,7 @@ class StoryViewModel: NSObject {
     }()
     
     private lazy var fetchDetailStoryCommand: Action<UInt64, AnyObject, NSError> = {
-        return Action<UInt64, AnyObject, NSError> {(input: UInt64) in
+        return Action<UInt64, AnyObject, NSError> {[unowned self] (input: UInt64) in
             return self.storyDataUtil.fetchDetailStoryInfo(withId: input)
         }
     }()
@@ -107,7 +108,7 @@ class StoryViewModel: NSObject {
     }()
     
     private lazy var fetchLatestStoriesCommand: Action<AnyObject, AnyObject, NSError> = {
-        return Action<AnyObject, AnyObject, NSError>{(input: AnyObject) in
+        return Action<AnyObject, AnyObject, NSError>{[unowned self](input: AnyObject) in
             return self.storyDataUtil.fetchLatestStories();
         }
     }()
@@ -146,7 +147,7 @@ class StoryViewModel: NSObject {
     }()
     
     private lazy var fetchPreviousStoryCommand: Action<String, AnyObject, NSError> = {
-        return Action<String, AnyObject, NSError> { (input: String) in
+        return Action<String, AnyObject, NSError> {[unowned self] (input: String) in
             return self.storyDataUtil.fetchStories(beforeDate: input)
         }
     }()

@@ -34,7 +34,6 @@ class StoryDetailViewController: UIViewController, UIScrollViewDelegate {
         tmpLabel.textAlignment = .left
         tmpLabel.numberOfLines = 2
         tmpLabel.lineBreakMode = .byWordWrapping
-//        tmpLabel.text = "我是测试测试标题，哈哈哈哈哈哈哈哈"
         
         return tmpLabel
     }()
@@ -44,7 +43,6 @@ class StoryDetailViewController: UIViewController, UIScrollViewDelegate {
         tmpLabel.font = UIFont.systemFont(ofSize: 10.0)
         tmpLabel.textColor = UIColor(colorLiteralRed: 200.0/255.0, green: 200.0/255.0, blue: 200.0/255.0, alpha: 1.0)
         tmpLabel.textAlignment = .right
-//        tmpLabel.text = "图片：《名侦探柯南》"
         
         return tmpLabel
     }()
@@ -72,7 +70,7 @@ class StoryDetailViewController: UIViewController, UIScrollViewDelegate {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.view.backgroundColor = UIColor.lightGray
+        self.view.backgroundColor = UIColor.white
         self.automaticallyAdjustsScrollViewInsets = false
         
         // Do any additional setup after loading the view.
@@ -156,6 +154,106 @@ class StoryDetailViewController: UIViewController, UIScrollViewDelegate {
             self.setStatusBarBackgroundColor(color: UIColor.clear)
             UIApplication.shared.statusBarStyle = .lightContent
         }
+    }
+    
+    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        let offsetY = scrollView.contentOffset.y
+        
+        let selectedIndexPath: IndexPath! = self.storyViewModel!.selectedIndexPath
+        if offsetY <= 0 {
+            // 下拉加载上一条
+            if !(selectedIndexPath.row == 0 && selectedIndexPath.section == 0) {
+                // 非第一条story
+                var tmpIndexPath: IndexPath!
+                if selectedIndexPath!.row - 1 < 0 {
+                    let rowCount = self.storyViewModel!.listStoryModels[selectedIndexPath.section - 1].count
+                    tmpIndexPath = IndexPath(row: rowCount-1, section: selectedIndexPath.section - 1)
+                }else {
+                    tmpIndexPath = IndexPath(row: selectedIndexPath!.row - 1, section: selectedIndexPath!.section)
+                }
+                
+                let model = self.storyViewModel!.listStoryModels[tmpIndexPath.section][tmpIndexPath.row]
+                let storyId = model.storyId
+                model.readed = true
+                
+                self.loadPreviousStoryDetailView(withId: storyId!, complete: {
+                    self.storyViewModel!.selectedIndexPath = tmpIndexPath
+                })
+            }
+        }
+        
+        if offsetY >= scrollView.contentSize.height - self.view.frame.size.height + scrollViewOffsetTop {
+            // 下拉加载下一条
+            var tmpIndexPath: IndexPath!
+            if selectedIndexPath.row + 1 > self.storyViewModel!.listStoryModels[selectedIndexPath.section].count {
+                // 到下一个section
+                tmpIndexPath = IndexPath(row: 0, section: selectedIndexPath.section + 1)
+            }else {
+                tmpIndexPath = IndexPath(row: selectedIndexPath.row + 1, section: selectedIndexPath.section)
+            }
+            
+            let model = self.storyViewModel!.listStoryModels[tmpIndexPath.section][tmpIndexPath.row]
+            let storyId = model.storyId
+            model.readed = true
+            
+            self.loadNextStoryDetailView(withId: storyId!, complete: { 
+                self.storyViewModel!.selectedIndexPath = tmpIndexPath
+            })
+        }
+    }
+    
+    /// 加载上一条story的详情页
+    ///
+    /// - Parameter withId: storyId
+    func loadPreviousStoryDetailView(withId: UInt64, complete: @escaping () -> Void) {
+        self.storyDetailView.isUserInteractionEnabled = false
+        let tmpView: StoryDetailView = StoryDetailView(frame: CGRect(x: 0, y: -self.view.frame.size.height, width: self.view.frame.size.width, height: self.view.frame.size.height))
+        tmpView.scrollView.contentInset = UIEdgeInsetsMake(-self.scrollViewOffsetTop, 0, 0, 0)
+        tmpView.scrollView.delegate = self
+        tmpView.isUserInteractionEnabled = false
+        self.view.addSubview(tmpView)
+        
+        let previousStoryDetailView = self.storyDetailView
+        self.storyDetailView = tmpView
+        self.storyViewModel!.fetchDetailStory(withId: withId)
+        
+        var frame = previousStoryDetailView.frame
+        frame.origin.y += UIScreen.main.bounds.size.height
+        UIView.animate(withDuration: 0.3, animations: {
+            previousStoryDetailView.frame = frame
+            tmpView.frame = CGRect(x: 0, y: 0, width: self.view.frame.size.width, height: self.view.frame.size.height)
+        }, completion: { (finished) in
+            previousStoryDetailView.removeFromSuperview()
+            tmpView.isUserInteractionEnabled = true
+            complete()
+        })
+    }
+    
+    /// 加载下一条story的详情页
+    ///
+    /// - Parameter withId: storyId
+    func loadNextStoryDetailView(withId: UInt64, complete: @escaping () -> Void) {
+        self.storyDetailView.isUserInteractionEnabled = false
+        let tmpView: StoryDetailView = StoryDetailView(frame: CGRect(x: 0, y: self.view.frame.size.height, width: self.view.frame.size.width, height: self.view.frame.size.height))
+        tmpView.scrollView.contentInset = UIEdgeInsetsMake(-self.scrollViewOffsetTop, 0, 0, 0)
+        tmpView.scrollView.delegate = self
+        tmpView.isUserInteractionEnabled = false
+        self.view.addSubview(tmpView)
+        
+        let previousStoryDetailView = self.storyDetailView
+        self.storyDetailView = tmpView
+        self.storyViewModel!.fetchDetailStory(withId: withId)
+        
+        var frame = previousStoryDetailView.frame
+        frame.origin.y -= UIScreen.main.bounds.size.height
+        UIView.animate(withDuration: 0.3, animations: {
+            previousStoryDetailView.frame = frame
+            tmpView.frame = CGRect(x: 0, y: 0, width: self.view.frame.size.width, height: self.view.frame.size.height)
+        }, completion: { (finished) in
+            previousStoryDetailView.removeFromSuperview()
+            tmpView.isUserInteractionEnabled = true
+            complete()
+        })
     }
 
     func setStatusBarBackgroundColor(color: UIColor) {

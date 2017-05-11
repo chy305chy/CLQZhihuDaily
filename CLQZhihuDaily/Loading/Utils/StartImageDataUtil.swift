@@ -16,40 +16,50 @@ class StartImageDataUtil: NSObject {
     let (imgSignal, imgObserver) = Signal<AnyObject, NoError>.pipe()
     
     /// 获取启动页的image的Url地址
-    func fetchStartImageUrl(success: @escaping (String, String)->Void) -> Void {
-        let url = String(format: "%@%@", Common.API_URL_START_IMAGE, "1080*1776")//"1242*1920")
-        Alamofire.request(url, method: .get, parameters: nil, encoding: JSONEncoding.default, headers: nil).responseJSON(completionHandler: { (response) in
-            switch(response.result) {
-            case .success:
-                let dict = response.result.value as! NSDictionary
-                let array = dict.object(forKey: "creatives") as! NSArray
-                let dict2 = array.object(at: 0) as! NSDictionary
-                // startImage url
-                let imgUrl = dict2.object(forKey: "url") as! String
-                // startImage author
-                let author = (dict2.object(forKey: "text") != nil) ? dict2.object(forKey: "text") as! String : ""
-                success(author, imgUrl)
-                break
-            case .failure(_):
-                print("获取startImage URL失败！")
-                break
-            }
+    func fetchStartImageUrl() -> SignalProducer<Dictionary<String, String>, NSError> {
+        return SignalProducer<Dictionary<String, String>, NSError>({ (observer, _) in
+            let url = String(format: "%@%@", Common.API_URL_START_IMAGE, "1080*1776")//"1242*1920")
+            Alamofire.request(url, method: .get, parameters: nil, encoding: JSONEncoding.default, headers: nil).responseJSON(completionHandler: { (response) in
+                switch(response.result) {
+                case .success:
+                    let dict = response.result.value as! NSDictionary
+                    let array = dict.object(forKey: "creatives") as! NSArray
+                    let dict2 = array.object(at: 0) as! NSDictionary
+                    // startImage url
+                    let imgUrl = dict2.object(forKey: "url") as! String
+                    // startImage author
+                    let author = (dict2.object(forKey: "text") != nil) ? dict2.object(forKey: "text") as! String : ""
+                    
+                    let tmpDict: Dictionary<String, String> = ["imgUrl": imgUrl, "author": author]
+                    
+                    observer.send(value: tmpDict)
+                    observer.sendCompleted()
+                    break
+                case .failure(let error):
+                    print("获取startImage URL失败！")
+                    observer.send(error: error as NSError)
+                    break
+                }
+            })
         })
     }
     
     /// 获取startImage
-    func fetchStartImage(withUrl: String, author: String) {
-        Alamofire.request(withUrl, method: .get, parameters: nil, encoding: URLEncoding.default, headers: nil).responseData { (response) in
-            switch(response.result) {
-            case .success:
-                self.imgObserver.send(value: response.result.value as AnyObject)
-                break
-            case .failure(_):
-                print("获取startImage失败！")
-                break
+    func fetchStartImage(withUrl: String) -> SignalProducer<AnyObject, NSError> {
+        return SignalProducer<AnyObject, NSError>({ (observer, _) in
+            Alamofire.request(withUrl, method: .get, parameters: nil, encoding: URLEncoding.default, headers: nil).responseData { (response) in
+                switch(response.result) {
+                case .success:
+                    observer.send(value: response.result.value as AnyObject)
+                    observer.sendCompleted()
+                    break
+                case .failure(let error):
+                    print("获取startImage失败！")
+                    observer.send(error: error as NSError)
+                    break
+                }
             }
-            self.imgObserver.sendCompleted()
-        }
+        })
     }
     
     /// 保存startImageModel（归档）
@@ -85,7 +95,7 @@ class StartImageDataUtil: NSObject {
         
         /* 3、通过解码恢复对象 */
         if tempData != nil {
-            let unarchiever = NSKeyedUnarchiver(forReadingWith: tempData as! Data)
+            let unarchiever = NSKeyedUnarchiver(forReadingWith: tempData! as Data)
             model = unarchiever.decodeObject(forKey: Common.START_IMAGE_FILE_KEY) as? StartImageModel
             unarchiever.finishDecoding()
             return model
