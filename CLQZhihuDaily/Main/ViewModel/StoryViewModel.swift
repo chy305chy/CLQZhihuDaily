@@ -26,8 +26,6 @@ class StoryViewModel: NSObject {
     var preDateString: String!
     // 选中cell的indexPath
     var selectedIndexPath: IndexPath!
-    var hasBindPreStorySignal = false
-    var hasBindLatestStorySignal = false
     var selectedStoryId: UInt64 = 0
     
     /// 获取story详情
@@ -225,7 +223,7 @@ class StoryViewModel: NSObject {
     }()
     
     private lazy var detailStoryTitleImageCommand: Action<String, UIImage, NSError> = {
-        return Action<String, UIImage, NSError> { (input: String) in
+        return Action<String, UIImage, NSError> {[unowned self] (input: String) in
             return self.storyDataUtil.fetchDetailStoryTitleImage(withUrl: input)
         }
     }()

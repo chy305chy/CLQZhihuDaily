@@ -21,6 +21,10 @@ class LoadingViewController: UIViewController {
 //    override var prefersStatusBarHidden: Bool {
 //        return true
 //    }
+    
+    private lazy var loadingViewModel: LoadingViewModel = {
+        return LoadingViewModel.sharedLoadingViewModel
+    }()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -29,15 +33,16 @@ class LoadingViewController: UIViewController {
         layoutSubview()
         
         // KVO
-        DynamicProperty<UIImage>(object: LoadingViewModel.sharedLoadingViewModel, keyPath: "startImage").producer.startWithSignal { (observer, disposable) in
-            observer.observeValues({ (value) in
+        DynamicProperty<UIImage>(object: self.loadingViewModel, keyPath: "startImage").producer.startWithSignal { (observer, disposable) in
+            observer.observeValues({[weak self] (value) in
+                guard let strongSelf = self else { return }
                 if let wrappedValue = value {
-                    self.authorLabel.text = LoadingViewModel.sharedLoadingViewModel.startImageAuthor
-                    self.startImageView.image = wrappedValue
+                    strongSelf.authorLabel.text = LoadingViewModel.sharedLoadingViewModel.startImageAuthor
+                    strongSelf.startImageView.image = wrappedValue
                     UIView.animate(withDuration: 1.5, animations: {
-                        self.logoImageView.alpha = 1.0
-                        self.startImageView.alpha = 1.0
-                        self.authorLabel.alpha = 1.0
+                        strongSelf.logoImageView.alpha = 1.0
+                        strongSelf.startImageView.alpha = 1.0
+                        strongSelf.authorLabel.alpha = 1.0
                     }, completion: { (finished) in
                         DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + DispatchTimeInterval.milliseconds(3000), execute: {
                             UIApplication.shared.keyWindow?.rootViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "viewController")
