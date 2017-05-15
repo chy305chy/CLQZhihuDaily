@@ -367,7 +367,9 @@ extension CyclePictureView {
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        self.delegate?.cyclePictureView(self, didSelectItemAtIndexPath: IndexPath(item: indexPath.item % self.imageBox!.imageArray.count, section: indexPath.section))
+        let index: Int! = indexPath.item % self.imageBox!.imageArray.count
+        self.delegate?.cyclePictureView(self, didSelectItemAtIndexPath: IndexPath(item: index, section: indexPath.section))
+        NotificationCenter.default.post(name: Notification.Name(rawValue: Common.NOTIFICATION_TOP_CYCLEIMAGE_SELECTION_INDEX), object: nil, userInfo: ["selectIndex": index])
     }
     
 }

@@ -99,6 +99,8 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
         NotificationCenter.default.addObserver(self, selector: #selector(fetchLatestStoriesCompletionHandler), name: NSNotification.Name(rawValue: Common.NOTIFICATION_FETCH_LATEST_STORIES_COMPLETE), object: nil)
         
         NotificationCenter.default.addObserver(self, selector: #selector(fetchPreviousStoriesCompletionHandler), name: NSNotification.Name(rawValue: Common.NOTIFICATION_FETCH_PREVIOUS_STORIES_COMPLETE), object: nil)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(topImageSelectionHandler(note:)), name: Notification.Name(rawValue: Common.NOTIFICATION_TOP_CYCLEIMAGE_SELECTION_INDEX), object: nil)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -113,6 +115,9 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     func fetchLatestStoriesCompletionHandler() {
+        // 先加载一次往期数据
+        self.loadPreviousData()
+        
         self.cyclePictureView.imageURLArray = self.storyViewModel.topStoryImageUrls
         self.cyclePictureView.imageTitleArray = self.storyViewModel.topStoryImageTitles
         self.storyTableView.reloadData()
@@ -266,6 +271,33 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
         DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + DispatchTimeInterval.milliseconds(500), execute: {
             self.storyViewModel.fetchLatestStories()
         })
+    }
+    
+    /// 接收到选择顶部轮播图片cell通知
+    ///
+    /// - Parameter note: 通知
+    func topImageSelectionHandler(note: Notification) {
+        let selectedIndex: Int = note.userInfo!["selectIndex"] as! Int
+        let firstLevelArray: Array<TopStoryBriefModel> = self.storyViewModel.topStoryModels[0]
+        let topModel: TopStoryBriefModel = firstLevelArray[selectedIndex]
+        let topStoryId: UInt64 = topModel.storyId
+        for i in 0 ..< self.storyViewModel.listStoryModels.count {
+            for j in 0 ..< self.storyViewModel.listStoryModels[i].count {
+                let model = self.storyViewModel.listStoryModels[i][j]
+                if model.storyId == topStoryId {
+                    // 找出与选中的topStory的id对应的listStory
+                    self.storyViewModel.selectedIndexPath = IndexPath(row: j, section: i)
+                    model.readed = true
+                    
+                    self.fetchDetailStoryData(withId: model.storyId)
+                    
+                    let storyDetailVC = StoryDetailViewController()
+                    storyDetailVC.storyViewModel = storyViewModel
+                    self.navigationController?.pushViewController(storyDetailVC, animated: true)
+                    break
+                }
+            }
+        }
     }
     
     /// 获取往期数据

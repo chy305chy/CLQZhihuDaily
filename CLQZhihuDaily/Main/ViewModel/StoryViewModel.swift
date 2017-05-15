@@ -95,6 +95,12 @@ class StoryViewModel: NSObject {
                     strongSelf.topStoryImageUrls.append(topStoryModel.image)
                     strongSelf.topStoryImageTitles.append(topStoryModel.title)
                 }
+                
+//                let formatter: DateFormatter = DateFormatter()
+//                formatter.dateFormat = "YYYYMMdd"
+//                let date: Date = formatter.date(from: latestDate)!
+//                let nextDate: Date = Date(timeInterval: 3600*24, since: date)
+//                let nextDateString: String = formatter.string(from: nextDate)
                 strongSelf.datesArray.append(latestDate)
                 strongSelf.sectionTitlesArray.append("")
                 strongSelf.listStoryModels.append(listModelsArray)
@@ -152,7 +158,12 @@ class StoryViewModel: NSObject {
     
     func fetchPreviousStories() {
         self.preDateString = self.previousDate()
-        self.fetchPreviousStoryCommand.apply(self.preDateString).start(self.previousStorySubscriber)
+        let formatter: DateFormatter = DateFormatter()
+        formatter.dateFormat = "YYYYMMdd"
+        let date: Date = formatter.date(from: self.preDateString)!
+        let inputDate: Date = Date(timeInterval: 3600*24, since: date)
+        let inputDateString: String = formatter.string(from: inputDate)
+        self.fetchPreviousStoryCommand.apply(inputDateString).start(self.previousStorySubscriber)
     }
     
     /// 获取在self.datesArray数组中最后一个元素之前的日期string
