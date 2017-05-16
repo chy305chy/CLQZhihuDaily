@@ -28,6 +28,16 @@ class ViewController: UIViewController {
     var distance: CGFloat = 0.0
     
     var mainView: UIView!
+    
+    var leftViewShowed: Bool = false {
+        didSet {
+            if self.leftViewShowed {
+                mainViewController.navigationItem.leftBarButtonItem?.action = #selector(ViewController.showMain)
+            }else {
+                mainViewController.navigationItem.leftBarButtonItem?.action = #selector(ViewController.showLeft)
+            }
+        }
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -51,12 +61,10 @@ class ViewController: UIViewController {
         
         self.view.addSubview(mainView)
         
-        mainViewController.navigationItem.leftBarButtonItem?.action = #selector(ViewController.showLeft)
-        
         /* 给主视图绑定panGesture */
-        let panGesture = mainViewController.panGesture
-        panGesture?.addTarget(self, action: #selector(ViewController.pan(_:)))
-//        mainView.addGestureRecognizer(panGesture!)
+        let panGesture: UIPanGestureRecognizer = mainViewController.panGesture
+        panGesture.addTarget(self, action: #selector(ViewController.pan(_:)))
+        mainView.addGestureRecognizer(panGesture)
         
         /* 单击收起左侧菜单 */
         tapGesture = UITapGestureRecognizer(target: self, action: #selector(ViewController.showMain))
@@ -67,6 +75,7 @@ class ViewController: UIViewController {
         mainView.addGestureRecognizer(tapGesture)
         distance = Common.leftViewWidth
         doAnimation("left")
+        self.leftViewShowed = true
     }
     
     /// 展示主视图
@@ -74,6 +83,7 @@ class ViewController: UIViewController {
         mainView.removeGestureRecognizer(tapGesture)
         distance = 0
         doAnimation("main")
+        self.leftViewShowed = false
     }
     
     /// 响应UIPanGestureRecognizer事件

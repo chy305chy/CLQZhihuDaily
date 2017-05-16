@@ -10,7 +10,6 @@
 		22E0940274D258B4B16A9B5F /* Pods_CLQZhihuDaily.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 897676E59143FA9533B5986C /* Pods_CLQZhihuDaily.framework */; };
 		B61E029C1E68149300F486E7 /* SectionHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61E029B1E68149300F486E7 /* SectionHeaderView.swift */; };
 		B61EA6C61E6D072E00435766 /* LoadCircleAnimateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61EA6C51E6D072E00435766 /* LoadCircleAnimateView.swift */; };
-		B622B17C1E519DA400FDD0AC /* LeftViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B622B17B1E519DA400FDD0AC /* LeftViewController.swift */; };
 		B622B1811E51A23600FDD0AC /* UINavigationBar+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B622B1801E51A23600FDD0AC /* UINavigationBar+Extension.swift */; };
 		B625F7541E56A0630021FF7E /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B625F7531E56A0630021FF7E /* MainViewController.swift */; };
 		B625F7561E56A0D20021FF7E /* StoryBriefModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B625F7551E56A0D20021FF7E /* StoryBriefModel.swift */; };
@@ -29,6 +28,13 @@
 		B65D45921E616BD0008070CE /* CalendarSingleton.swift in Sources */ = {isa = PBXBuildFile; fileRef = B65D45911E616BD0008070CE /* CalendarSingleton.swift */; };
 		B67D6F441EC05925002C932E /* StoryDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B67D6F431EC05925002C932E /* StoryDetailView.swift */; };
 		B67D6F461EC0873B002C932E /* ListStoryTitleTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B67D6F451EC0873B002C932E /* ListStoryTitleTextView.swift */; };
+		B684013D1EC98FAC00AC3C2C /* LeftViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B684013B1EC98FAC00AC3C2C /* LeftViewController.swift */; };
+		B684013F1EC990F800AC3C2C /* AccountLoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B684013E1EC990F800AC3C2C /* AccountLoginView.swift */; };
+		B68401411EC99BAB00AC3C2C /* SettingFavoriteMsgView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B68401401EC99BAB00AC3C2C /* SettingFavoriteMsgView.swift */; };
+		B68401431EC99F6500AC3C2C /* CLQButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = B68401421EC99F6500AC3C2C /* CLQButton.swift */; };
+		B68401481EC9AC2200AC3C2C /* MenuTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B68401461EC9AC2200AC3C2C /* MenuTableViewCell.swift */; };
+		B68401491EC9AC2200AC3C2C /* MenuTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = B68401471EC9AC2200AC3C2C /* MenuTableViewCell.xib */; };
+		B69959871ECA9064005F868C /* BottomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B69959861ECA9064005F868C /* BottomView.swift */; };
 		B6CFFBCC1E4D6ECD00C6949E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6CFFBCB1E4D6ECD00C6949E /* AppDelegate.swift */; };
 		B6CFFBCE1E4D6ECD00C6949E /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6CFFBCD1E4D6ECD00C6949E /* ViewController.swift */; };
 		B6CFFBD11E4D6ECD00C6949E /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B6CFFBCF1E4D6ECD00C6949E /* Main.storyboard */; };
@@ -70,7 +76,6 @@
 		8F1195C95A5BB07BD50398BB /* Pods-CLQZhihuDaily.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CLQZhihuDaily.release.xcconfig"; path = "Pods/Target Support Files/Pods-CLQZhihuDaily/Pods-CLQZhihuDaily.release.xcconfig"; sourceTree = "<group>"; };
 		B61E029B1E68149300F486E7 /* SectionHeaderView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SectionHeaderView.swift; sourceTree = "<group>"; };
 		B61EA6C51E6D072E00435766 /* LoadCircleAnimateView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoadCircleAnimateView.swift; sourceTree = "<group>"; };
-		B622B17B1E519DA400FDD0AC /* LeftViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LeftViewController.swift; sourceTree = "<group>"; };
 		B622B1801E51A23600FDD0AC /* UINavigationBar+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UINavigationBar+Extension.swift"; sourceTree = "<group>"; };
 		B625F7531E56A0630021FF7E /* MainViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
 		B625F7551E56A0D20021FF7E /* StoryBriefModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StoryBriefModel.swift; sourceTree = "<group>"; };
@@ -89,6 +94,13 @@
 		B65D45911E616BD0008070CE /* CalendarSingleton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalendarSingleton.swift; sourceTree = "<group>"; };
 		B67D6F431EC05925002C932E /* StoryDetailView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StoryDetailView.swift; sourceTree = "<group>"; };
 		B67D6F451EC0873B002C932E /* ListStoryTitleTextView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ListStoryTitleTextView.swift; sourceTree = "<group>"; };
+		B684013B1EC98FAC00AC3C2C /* LeftViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LeftViewController.swift; sourceTree = "<group>"; };
+		B684013E1EC990F800AC3C2C /* AccountLoginView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AccountLoginView.swift; sourceTree = "<group>"; };
+		B68401401EC99BAB00AC3C2C /* SettingFavoriteMsgView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingFavoriteMsgView.swift; sourceTree = "<group>"; };
+		B68401421EC99F6500AC3C2C /* CLQButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CLQButton.swift; sourceTree = "<group>"; };
+		B68401461EC9AC2200AC3C2C /* MenuTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MenuTableViewCell.swift; sourceTree = "<group>"; };
+		B68401471EC9AC2200AC3C2C /* MenuTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MenuTableViewCell.xib; sourceTree = "<group>"; };
+		B69959861ECA9064005F868C /* BottomView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BottomView.swift; sourceTree = "<group>"; };
 		B6CFFBC81E4D6ECD00C6949E /* CLQZhihuDaily.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CLQZhihuDaily.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B6CFFBCB1E4D6ECD00C6949E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		B6CFFBCD1E4D6ECD00C6949E /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -150,7 +162,9 @@
 		B622B17A1E519DA400FDD0AC /* SideMenu（侧边栏） */ = {
 			isa = PBXGroup;
 			children = (
-				B622B17B1E519DA400FDD0AC /* LeftViewController.swift */,
+				B68401381EC98FAC00AC3C2C /* Model */,
+				B68401391EC98FAC00AC3C2C /* View */,
+				B684013C1EC98FAC00AC3C2C /* ViewModel */,
 			);
 			name = "SideMenu（侧边栏）";
 			path = SideMenu;
@@ -230,6 +244,7 @@
 			isa = PBXGroup;
 			children = (
 				B64328E21E5D6A2B00D153C9 /* CycleImageScrollView */,
+				B68401421EC99F6500AC3C2C /* CLQButton.swift */,
 			);
 			path = CustomKit;
 			sourceTree = "<group>";
@@ -251,6 +266,41 @@
 				B65D45911E616BD0008070CE /* CalendarSingleton.swift */,
 			);
 			path = Singletons;
+			sourceTree = "<group>";
+		};
+		B68401381EC98FAC00AC3C2C /* Model */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		B68401391EC98FAC00AC3C2C /* View */ = {
+			isa = PBXGroup;
+			children = (
+				B684013A1EC98FAC00AC3C2C /* Controller */,
+				B684013E1EC990F800AC3C2C /* AccountLoginView.swift */,
+				B68401401EC99BAB00AC3C2C /* SettingFavoriteMsgView.swift */,
+				B68401461EC9AC2200AC3C2C /* MenuTableViewCell.swift */,
+				B68401471EC9AC2200AC3C2C /* MenuTableViewCell.xib */,
+				B69959861ECA9064005F868C /* BottomView.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		B684013A1EC98FAC00AC3C2C /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				B684013B1EC98FAC00AC3C2C /* LeftViewController.swift */,
+			);
+			path = Controller;
+			sourceTree = "<group>";
+		};
+		B684013C1EC98FAC00AC3C2C /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = ViewModel;
 			sourceTree = "<group>";
 		};
 		B6CFFBBF1E4D6ECD00C6949E = {
@@ -490,6 +540,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B68401491EC9AC2200AC3C2C /* MenuTableViewCell.xib in Resources */,
 				B6CFFBD91E4D6ECD00C6949E /* LaunchScreen.storyboard in Resources */,
 				B6D952D91E555BA000E8B8AB /* LoadingScreen.storyboard in Resources */,
 				B6287AEC1E57F2EF00C42BF5 /* ListStoryCell.xib in Resources */,
@@ -571,6 +622,7 @@
 				B625F75C1E56A4D80021FF7E /* TopStoryBriefModel.swift in Sources */,
 				B64328E71E5D6A5300D153C9 /* CyclePictureCell.swift in Sources */,
 				B61EA6C61E6D072E00435766 /* LoadCircleAnimateView.swift in Sources */,
+				B69959871ECA9064005F868C /* BottomView.swift in Sources */,
 				B64329141E5D8CD700D153C9 /* GradientView.swift in Sources */,
 				B6CFFBCE1E4D6ECD00C6949E /* ViewController.swift in Sources */,
 				B64329161E5DA80400D153C9 /* MainNavigationController.swift in Sources */,
@@ -582,12 +634,14 @@
 				B625F7581E56A0DC0021FF7E /* StoryDetailModel.swift in Sources */,
 				B6CFFC011E4D96A900C6949E /* Common.swift in Sources */,
 				B622B1811E51A23600FDD0AC /* UINavigationBar+Extension.swift in Sources */,
+				B68401411EC99BAB00AC3C2C /* SettingFavoriteMsgView.swift in Sources */,
 				B625F75E1E56AAF50021FF7E /* StoryDataUtil.swift in Sources */,
-				B622B17C1E519DA400FDD0AC /* LeftViewController.swift in Sources */,
 				B65D45921E616BD0008070CE /* CalendarSingleton.swift in Sources */,
 				B6E7C6DF1E545494002056C0 /* StartImageDataUtil.swift in Sources */,
 				B67D6F441EC05925002C932E /* StoryDetailView.swift in Sources */,
+				B684013D1EC98FAC00AC3C2C /* LeftViewController.swift in Sources */,
 				B6287AEB1E57F2EF00C42BF5 /* ListStoryCell.swift in Sources */,
+				B68401481EC9AC2200AC3C2C /* MenuTableViewCell.swift in Sources */,
 				B6D819001EC19E6300AB9017 /* StoryDetailViewController.swift in Sources */,
 				B6D952D71E555B9400E8B8AB /* LoadingViewController.swift in Sources */,
 				B6D952DB1E558AB800E8B8AB /* StartImageModel.swift in Sources */,
@@ -596,7 +650,9 @@
 				B64328E81E5D6A5300D153C9 /* CyclePictureView.swift in Sources */,
 				B61E029C1E68149300F486E7 /* SectionHeaderView.swift in Sources */,
 				B6E7C6E11E545564002056C0 /* LoadingViewModel.swift in Sources */,
+				B68401431EC99F6500AC3C2C /* CLQButton.swift in Sources */,
 				B64328E61E5D6A5300D153C9 /* AuxiliaryModels.swift in Sources */,
+				B684013F1EC990F800AC3C2C /* AccountLoginView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

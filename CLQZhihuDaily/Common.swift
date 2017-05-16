@@ -14,11 +14,14 @@ struct Common {
     static let screenHeight = UIScreen.main.bounds.height
     static let rootViewController = UIApplication.shared.keyWindow?.rootViewController as! ViewController
     /// 侧边栏的宽度
-    static let leftViewWidth: CGFloat = 200.0
+    static let leftViewWidth: CGFloat = UIScreen.main.bounds.size.width * 0.7
     static let TABLEVIEW_HEADER_VIEW_HEIGHT = 44
     static let TABLEVIEW_ROW_HEIGHT = 90
     
-    static let GLOBAL_COLOR_BLUE = UIColor(red: 1/255.0, green: 131/255.0, blue: 209/255.0, alpha: 1)
+    static let GLOBAL_COLOR_BLUE = UIColor(red: 1.0/255.0, green: 131.0/255.0, blue: 209.0/255.0, alpha: 1.0)
+    static let SIDEBAR_BGCOLOR = UIColor(red: 36.0/255.0, green: 42.0/255.0, blue: 50.0/255.0, alpha: 1.0)
+    static let SIDEBAR_TEXTCOLOR = UIColor(red: 144.0/255.0, green: 146.0/255.0, blue: 156.0/255.0, alpha: 1.0)
+    static let SIDEBAR_SEPLINE_COLOR = UIColor(red: 28/255, green: 34/255, blue: 42/255, alpha: 1.0)
     
     /* API地址 */
     static let API_URL = "http://news-at.zhihu.com/api/4/news/"

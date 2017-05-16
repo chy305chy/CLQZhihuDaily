@@ -61,7 +61,7 @@
                         <barButtonItem key="leftBarButtonItem" image="Home_Icon" id="Bb0-lD-oHd"/>
                     </navigationItem>
                     <connections>
-                        <outlet property="panGesture" destination="pBo-vw-g77" id="ehe-Ec-Khk"/>
+                        <outlet property="panGesture" destination="pBo-vw-g77" id="ZTO-1m-f8Y"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="y2V-Xi-dw8" userLabel="First Responder" sceneMemberID="firstResponder"/>
