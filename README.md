@@ -9,6 +9,12 @@ iOS版知乎日报（Swift 3.1）
 
 功能简介：
 
+1、今日热闻：新闻列表、顶部轮播图片新闻；
+
+2、新闻详情：新闻详情查看，详情页下拉加载上一条、上拉加载下一条新闻；
+
+3、侧边栏
+
 ![Alt Text](https://github.com/chy305chy/CLQZhihuDaily/blob/master/gif/1.gif)
 
 
