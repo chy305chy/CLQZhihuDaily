@@ -9,10 +9,10 @@ iOS版知乎日报（Swift 3.1）
 
 功能简介：
 
-![Alt Text](https://github.com/CLQZhihuDaily/gif/1.gif)
+![Alt Text](https://github.com/chy305chy/CLQZhihuDaily/blob/master/gif/1.gif)
 
 
-![Alt Text](https://github.com/CLQZhihuDaily/gif/2.gif)
+![Alt Text](https://github.com/chy305chy/CLQZhihuDaily/blob/master/gif/2.gif)
 
 
-![Alt Text](https://github.com/CLQZhihuDaily/gif/3.gif)
+![Alt Text](https://github.com/chy305chy/CLQZhihuDaily/blob/master/gif/3.gif)
