@@ -24,10 +24,16 @@ struct Common {
     static let SIDEBAR_SEPLINE_COLOR = UIColor(red: 28/255, green: 34/255, blue: 42/255, alpha: 1.0)
     
     /* API地址 */
+    /// 获取story详情信息
     static let API_URL = "http://news-at.zhihu.com/api/4/news/"
+    /// 获取最新的story信息
     static let API_URL_NEWS_LATEST = "http://news-at.zhihu.com/api/4/news/latest"
+    /// 获取往期的story信息
     static let API_URL_NEWS_BEFORE = "http://news.at.zhihu.com/api/4/news/before/"
+    /// 获取启动图片
     static let API_URL_START_IMAGE = "http://news-at.zhihu.com/api/7/prefetch-launch-images/"
+    /// 获取某条story的额外信息：评论数量、点赞数等，后接storyId
+    static let API_URL_NEWS_EXTRA_INFO = "http://news-at.zhihu.com/api/4/story-extra/"
     
     /* startImageModel归档文件 */
     static let START_IMAGE_FILE_NAME = "startImage.plist"

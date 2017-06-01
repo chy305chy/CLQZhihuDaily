@@ -51,6 +51,9 @@
 		B6E795471EC54F520077F8C8 /* StoryDetailPullView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6E795461EC54F520077F8C8 /* StoryDetailPullView.swift */; };
 		B6E7C6DF1E545494002056C0 /* StartImageDataUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6E7C6DE1E545494002056C0 /* StartImageDataUtil.swift */; };
 		B6E7C6E11E545564002056C0 /* LoadingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6E7C6E01E545564002056C0 /* LoadingViewModel.swift */; };
+		B6F104D91EDFAE41005677BE /* StoryDetailBottomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F104D81EDFAE41005677BE /* StoryDetailBottomView.swift */; };
+		B6F104DB1EDFC48F005677BE /* StoryDetailExtraModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F104DA1EDFC48F005677BE /* StoryDetailExtraModel.swift */; };
+		B6F104DD1EDFF116005677BE /* CLQBadgeButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F104DC1EDFF116005677BE /* CLQBadgeButton.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -123,6 +126,9 @@
 		B6E795461EC54F520077F8C8 /* StoryDetailPullView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StoryDetailPullView.swift; sourceTree = "<group>"; };
 		B6E7C6DE1E545494002056C0 /* StartImageDataUtil.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StartImageDataUtil.swift; sourceTree = "<group>"; };
 		B6E7C6E01E545564002056C0 /* LoadingViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoadingViewModel.swift; sourceTree = "<group>"; };
+		B6F104D81EDFAE41005677BE /* StoryDetailBottomView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StoryDetailBottomView.swift; sourceTree = "<group>"; };
+		B6F104DA1EDFC48F005677BE /* StoryDetailExtraModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StoryDetailExtraModel.swift; sourceTree = "<group>"; };
+		B6F104DC1EDFF116005677BE /* CLQBadgeButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CLQBadgeButton.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -196,6 +202,7 @@
 				B625F7591E56A4C60021FF7E /* ListStoryBriefModel.swift */,
 				B625F75B1E56A4D80021FF7E /* TopStoryBriefModel.swift */,
 				B625F7571E56A0DC0021FF7E /* StoryDetailModel.swift */,
+				B6F104DA1EDFC48F005677BE /* StoryDetailExtraModel.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -218,6 +225,7 @@
 				B61EA6C51E6D072E00435766 /* LoadCircleAnimateView.swift */,
 				B67D6F431EC05925002C932E /* StoryDetailView.swift */,
 				B6E795461EC54F520077F8C8 /* StoryDetailPullView.swift */,
+				B6F104D81EDFAE41005677BE /* StoryDetailBottomView.swift */,
 				B67D6F451EC0873B002C932E /* ListStoryTitleTextView.swift */,
 			);
 			path = View;
@@ -245,6 +253,7 @@
 			children = (
 				B64328E21E5D6A2B00D153C9 /* CycleImageScrollView */,
 				B68401421EC99F6500AC3C2C /* CLQButton.swift */,
+				B6F104DC1EDFF116005677BE /* CLQBadgeButton.swift */,
 			);
 			path = CustomKit;
 			sourceTree = "<group>";
@@ -628,8 +637,10 @@
 				B64329161E5DA80400D153C9 /* MainNavigationController.swift in Sources */,
 				B625F7541E56A0630021FF7E /* MainViewController.swift in Sources */,
 				B625F7601E56E1DC0021FF7E /* StoryViewModel.swift in Sources */,
+				B6F104D91EDFAE41005677BE /* StoryDetailBottomView.swift in Sources */,
 				B6CFFBCC1E4D6ECD00C6949E /* AppDelegate.swift in Sources */,
 				B6CFFBD41E4D6ECD00C6949E /* CLQZhihuDaily.xcdatamodeld in Sources */,
+				B6F104DB1EDFC48F005677BE /* StoryDetailExtraModel.swift in Sources */,
 				B625F75A1E56A4C60021FF7E /* ListStoryBriefModel.swift in Sources */,
 				B625F7581E56A0DC0021FF7E /* StoryDetailModel.swift in Sources */,
 				B6CFFC011E4D96A900C6949E /* Common.swift in Sources */,
@@ -638,6 +649,7 @@
 				B625F75E1E56AAF50021FF7E /* StoryDataUtil.swift in Sources */,
 				B65D45921E616BD0008070CE /* CalendarSingleton.swift in Sources */,
 				B6E7C6DF1E545494002056C0 /* StartImageDataUtil.swift in Sources */,
+				B6F104DD1EDFF116005677BE /* CLQBadgeButton.swift in Sources */,
 				B67D6F441EC05925002C932E /* StoryDetailView.swift in Sources */,
 				B684013D1EC98FAC00AC3C2C /* LeftViewController.swift in Sources */,
 				B6287AEB1E57F2EF00C42BF5 /* ListStoryCell.swift in Sources */,

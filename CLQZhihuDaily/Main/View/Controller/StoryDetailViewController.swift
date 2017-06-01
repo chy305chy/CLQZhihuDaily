@@ -60,7 +60,7 @@ class StoryDetailViewController: UIViewController, UIScrollViewDelegate, UIWebVi
     }()
     
     lazy var storyDetailView: StoryDetailView = {
-        let tmpView: StoryDetailView = StoryDetailView(frame: CGRect(x: 0, y: 0, width: self.view.frame.size.width, height: self.view.frame.size.height))
+        let tmpView: StoryDetailView = StoryDetailView(frame: CGRect(x: 0, y: 0, width: self.view.frame.size.width, height: self.view.frame.size.height - 45))
         tmpView.scrollView.contentInset = UIEdgeInsetsMake(-self.scrollViewOffsetTop, 0, 0, 0)
         tmpView.scrollView.delegate = self
         tmpView.scrollView.backgroundColor = UIColor.white
@@ -97,6 +97,17 @@ class StoryDetailViewController: UIViewController, UIScrollViewDelegate, UIWebVi
         
         return tmpPullView
     }()
+    
+    /// 底部评论、赞等视图
+    lazy var bottomActionView: StoryDetailBottomView = {
+        let tmpBottomView: StoryDetailBottomView = StoryDetailBottomView(frame: CGRect.init(x: 0, y: self.view.frame.size.height - 45, width: self.view.frame.size.width, height: 45))
+        tmpBottomView.backButton.addTarget(self, action: #selector(backToMain), for: .touchUpInside)
+        tmpBottomView.nextStoryButton.addTarget(self, action: #selector(loadNextStory), for: .touchUpInside)
+        tmpBottomView.voteButton.addTarget(self, action: #selector(vote), for: .touchUpInside)
+        tmpBottomView.commentButton.addTarget(self, action: #selector(comment), for: .touchUpInside)
+        
+        return tmpBottomView
+    }()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -107,6 +118,7 @@ class StoryDetailViewController: UIViewController, UIScrollViewDelegate, UIWebVi
         self.view.addSubview(self.storyDetailView)
         self.view.addSubview(self.topPullView)
         self.storyDetailView.scrollView.addSubview(self.bottomPullView)
+        self.view.addSubview(self.bottomActionView)
         
         /// KVO
         DynamicProperty<StoryDetailModel>(object: self.storyViewModel!, keyPath: "storyDetailModel").producer.startWithSignal { (observer, disposable) in
@@ -154,6 +166,16 @@ class StoryDetailViewController: UIViewController, UIScrollViewDelegate, UIWebVi
             observer.observeValues({[weak self] (value) in
                 guard let strongSelf = self else { return }
                 strongSelf.titleImageView.image = value
+            })
+        }
+        
+        DynamicProperty<StoryDetailExtraModel>(object: self.storyViewModel!, keyPath: "storyDetailExtraModel").producer.startWithSignal { (observer, disposable) in
+            observer.observeValues({[weak self] (value) in
+                guard let strongSelf = self else { return }
+                if value != nil {
+                    strongSelf.bottomActionView.voteCount = value?.popularity
+                    strongSelf.bottomActionView.commentCount = value?.comments
+                }
             })
         }
     }
@@ -212,8 +234,8 @@ class StoryDetailViewController: UIViewController, UIScrollViewDelegate, UIWebVi
         }
         
         // 上拉控件
-        if offsetY >= scrollView.contentSize.height - UIScreen.main.bounds.size.height {
-            if offsetY >=  scrollView.contentSize.height - UIScreen.main.bounds.size.height + self.scrollViewOffsetTop{
+        if offsetY >= scrollView.contentSize.height - UIScreen.main.bounds.size.height + 45 {
+            if offsetY >=  scrollView.contentSize.height - UIScreen.main.bounds.size.height + 45 + self.scrollViewOffsetTop{
                 if !self.bottomPullView.pullTriggered {
                     self.bottomPullView.pullTriggered = true
                 }
@@ -260,34 +282,57 @@ class StoryDetailViewController: UIViewController, UIScrollViewDelegate, UIWebVi
         }
         
         if offsetY >= scrollView.contentSize.height - self.view.frame.size.height + scrollViewOffsetTop {
-            // 上拉加载下一条
-            var tmpIndexPath: IndexPath!
-            if selectedIndexPath.row + 1 > self.storyViewModel!.listStoryModels[selectedIndexPath.section].count {
-                // 到下一个section
-                tmpIndexPath = IndexPath(row: 0, section: selectedIndexPath.section + 1)
-            }else {
-                tmpIndexPath = IndexPath(row: selectedIndexPath.row + 1, section: selectedIndexPath.section)
-            }
-            
-            let model = self.storyViewModel!.listStoryModels[tmpIndexPath.section][tmpIndexPath.row]
-            let storyId = model.storyId
-            model.readed = true
-            
-            self.changeAndLoadNextStoryDetailView(withId: storyId!, type: "next", complete: {
-                self.storyViewModel!.selectedIndexPath = tmpIndexPath
-                // 完成时要重置statusBar的背景色和style
-                self.setStatusBarBackgroundColor(color: UIColor.clear)
-                UIApplication.shared.statusBarStyle = .lightContent
-                
-                self.topPullView.frame = CGRect(x: 0, y: -self.scrollViewOffsetTop, width: self.view.frame.size.width, height: self.scrollViewOffsetTop)
-                self.view.bringSubview(toFront: self.topPullView)
-                
-                if !(tmpIndexPath.row == 0 && tmpIndexPath.section == 0) {
-                    self.topPullView.tipText = "加载上一篇"
-                    self.topPullView.isFirstStory = false
-                }
-            })
+            self.loadNextStory()
         }
+    }
+    
+    func backToMain() {
+        self.navigationController?.popViewController(animated: true)
+    }
+    
+    func loadNextStory() {
+        let selectedIndexPath: IndexPath! = self.storyViewModel!.selectedIndexPath
+        // 上拉加载下一条
+        var tmpIndexPath: IndexPath!
+        if selectedIndexPath.row + 1 > self.storyViewModel!.listStoryModels[selectedIndexPath.section].count {
+            // 到下一个section
+            tmpIndexPath = IndexPath(row: 0, section: selectedIndexPath.section + 1)
+        }else {
+            tmpIndexPath = IndexPath(row: selectedIndexPath.row + 1, section: selectedIndexPath.section)
+        }
+        
+        let model = self.storyViewModel!.listStoryModels[tmpIndexPath.section][tmpIndexPath.row]
+        let storyId = model.storyId
+        model.readed = true
+        
+        self.changeAndLoadNextStoryDetailView(withId: storyId!, type: "next", complete: {
+            self.storyViewModel!.selectedIndexPath = tmpIndexPath
+            // 完成时要重置statusBar的背景色和style
+            self.setStatusBarBackgroundColor(color: UIColor.clear)
+            UIApplication.shared.statusBarStyle = .lightContent
+            
+            self.topPullView.frame = CGRect(x: 0, y: -self.scrollViewOffsetTop, width: self.view.frame.size.width, height: self.scrollViewOffsetTop)
+            self.view.bringSubview(toFront: self.topPullView)
+            
+            if !(tmpIndexPath.row == 0 && tmpIndexPath.section == 0) {
+                self.topPullView.tipText = "加载上一篇"
+                self.topPullView.isFirstStory = false
+            }
+        })
+    }
+    
+    func vote() {
+        let alert: UIAlertController = UIAlertController(title: nil, message: String(format: "收到了%d个赞", self.storyViewModel!.storyDetailExtraModel!.popularity), preferredStyle: .alert)
+        let alertAction: UIAlertAction = UIAlertAction(title: "确定", style: .default, handler: nil)
+        alert.addAction(alertAction)
+        self.present(alert, animated: true, completion: nil)
+    }
+    
+    func comment() {
+        let alert: UIAlertController = UIAlertController(title: nil, message: String(format: "收到了%d个评论", self.storyViewModel!.storyDetailExtraModel!.comments), preferredStyle: .alert)
+        let alertAction: UIAlertAction = UIAlertAction(title: "确定", style: .default, handler: nil)
+        alert.addAction(alertAction)
+        self.present(alert, animated: true, completion: nil)
     }
     
     /// 加载上一篇或下一篇story并切换
@@ -301,10 +346,10 @@ class StoryDetailViewController: UIViewController, UIScrollViewDelegate, UIWebVi
         var tmpView: StoryDetailView!
         if type == "previous" {
             // 加载上一篇
-            tmpView = StoryDetailView(frame: CGRect(x: 0, y: -self.view.frame.size.height, width: self.view.frame.size.width, height: self.view.frame.size.height))
+            tmpView = StoryDetailView(frame: CGRect(x: 0, y: -(self.view.frame.size.height-45), width: self.view.frame.size.width, height: self.view.frame.size.height - 45))
         }else {
             // 加载下一篇
-            tmpView = StoryDetailView(frame: CGRect(x: 0, y: self.view.frame.size.height, width: self.view.frame.size.width, height: self.view.frame.size.height))
+            tmpView = StoryDetailView(frame: CGRect(x: 0, y: self.view.frame.size.height-45, width: self.view.frame.size.width, height: self.view.frame.size.height - 45))
         }
         
         tmpView.scrollView.contentInset = UIEdgeInsetsMake(-self.scrollViewOffsetTop, 0, 0, 0)
@@ -313,30 +358,31 @@ class StoryDetailViewController: UIViewController, UIScrollViewDelegate, UIWebVi
         tmpView.scrollView.backgroundColor = UIColor.white
         tmpView.delegate = self
         self.view.addSubview(tmpView)
+        self.view.sendSubview(toBack: tmpView)
         
         let previousStoryDetailView = self.storyDetailView
         self.storyDetailView = tmpView
         self.storyViewModel!.fetchDetailStory(withId: withId)
+        self.storyViewModel!.fetchDetailStoryExtraInfo(withId: withId)
         var frame = previousStoryDetailView.frame
         
         if type == "previous" {
             // 加载上一篇
-            frame.origin.y += UIScreen.main.bounds.size.height
+            frame.origin.y += UIScreen.main.bounds.size.height-45
         }else {
             // 加载下一篇
-            frame.origin.y -= UIScreen.main.bounds.size.height
+            frame.origin.y -= UIScreen.main.bounds.size.height-45
         }
         
         UIView.animate(withDuration: 0.3, animations: {
             previousStoryDetailView.frame = frame
-            tmpView.frame = CGRect(x: 0, y: 0, width: self.view.frame.size.width, height: self.view.frame.size.height)
+            tmpView.frame = CGRect(x: 0, y: 0, width: self.view.frame.size.width, height: self.view.frame.size.height-45)
         }, completion: { (finished) in
             previousStoryDetailView.removeFromSuperview()
             tmpView.isUserInteractionEnabled = true
             tmpView.scrollView.addSubview(self.bottomPullView)
             complete()
         })
-        
     }
 
     func setStatusBarBackgroundColor(color: UIColor) {

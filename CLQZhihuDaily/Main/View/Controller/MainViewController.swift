@@ -308,6 +308,7 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     func fetchDetailStoryData(withId: UInt64) {
         storyViewModel.fetchDetailStory(withId: withId)
+        storyViewModel.fetchDetailStoryExtraInfo(withId: withId)
     }
     
     func setStatusBarBackgroundColor(color: UIColor) {

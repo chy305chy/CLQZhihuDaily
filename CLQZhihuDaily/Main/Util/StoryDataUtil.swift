@@ -74,6 +74,28 @@ class StoryDataUtil: NSObject {
         }
     }
     
+    /// 获取story详情的额外数据：评论数目、点赞数等
+    ///
+    /// - Parameter withId: storyId
+    /// - Returns: SignalProducer
+    func fetchDetailStoryExtraInfo(withId: UInt64) -> SignalProducer<AnyObject, NSError> {
+        return SignalProducer<AnyObject, NSError>({ (observer, _) in
+            let url = String(format: "%@%lu", Common.API_URL_NEWS_EXTRA_INFO, withId)
+            Alamofire.request(url, method: .get, parameters: nil, encoding: JSONEncoding.default, headers: nil).responseJSON(completionHandler: { (response) in
+                switch(response.result) {
+                case .success:
+                    observer.send(value: response.result.value as AnyObject)
+                    observer.sendCompleted()
+                    break
+                case .failure(let error):
+                    print("获取story详情评论数据失败！: %@", error)
+                    observer.send(error: error as NSError)
+                    break
+                }
+            })
+        })
+    }
+    
     /// 获取story详情页的顶部标题图片
     ///
     /// - Parameter withUrl: 图片url地址

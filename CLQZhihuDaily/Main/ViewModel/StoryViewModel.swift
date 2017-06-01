@@ -23,6 +23,7 @@ class StoryViewModel: NSObject {
     
     dynamic var storyDetailModel: StoryDetailModel?
     dynamic var detailStoryTitleImage: UIImage?
+    dynamic var storyDetailExtraModel: StoryDetailExtraModel?
     var preDateString: String!
     // 选中cell的indexPath
     var selectedIndexPath: IndexPath!
@@ -47,6 +48,27 @@ class StoryViewModel: NSObject {
     
     func fetchDetailStory(withId: UInt64) {
         self.fetchDetailStoryCommand.apply(withId).start(self.detailStorySubscriber)
+    }
+    
+    /// 获取story详情的额外信息：评论数目、点赞数等
+    private lazy var detailStoryExtraInfoSubscriber: Observer<AnyObject, ActionError<NSError>> = {
+        return Observer<AnyObject, ActionError<NSError>>(value: {[weak self] (value) in
+            guard let strongSelf = self else { return }
+            let dict: NSDictionary = value as! NSDictionary
+            strongSelf.storyDetailExtraModel = StoryDetailExtraModel(withDict: dict)
+        }, failed: nil, completed: { 
+            
+        }, interrupted: nil)
+    }()
+    
+    private lazy var fetchDetailStoryExtraInfoCommand: Action<UInt64, AnyObject, NSError> = {
+        return Action<UInt64, AnyObject, NSError> {[unowned self] (input: UInt64) in
+            return self.storyDataUtil.fetchDetailStoryExtraInfo(withId: input)
+        }
+    }()
+    
+    func fetchDetailStoryExtraInfo(withId: UInt64) {
+        self.fetchDetailStoryExtraInfoCommand.apply(withId).start(self.detailStoryExtraInfoSubscriber)
     }
     
     /// 获取最新的story
