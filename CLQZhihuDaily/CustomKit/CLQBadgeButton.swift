@@ -15,6 +15,19 @@ enum CLQBadgeButtonType {
 }
 
 class CLQBadgeButton: UIControl {
+    
+    /// 投票按钮用
+    var voted: Bool = false {
+        didSet {
+            if self.voted {
+                self.buttonImageView.image = UIImage(named: "News_Navigation_Voted")
+                self.badgeTextLabel.textColor = Common.GLOBAL_COLOR_BLUE
+            }else {
+                self.buttonImageView.image = UIImage(named: "News_Navigation_Vote")
+                self.badgeTextLabel.textColor = UIColor(colorLiteralRed: 158.0/255.0, green: 158.0/255.0, blue: 158.0/255.0, alpha: 1.0)
+            }
+        }
+    }
 
     var badgeText: String! {
         didSet {
@@ -63,9 +76,10 @@ class CLQBadgeButton: UIControl {
     
     private lazy var badgeTextLabel: UILabel = {
         let tmpLabel = UILabel()
-        tmpLabel.font = UIFont.systemFont(ofSize: 8.0)
+        tmpLabel.font = UIFont.systemFont(ofSize: 9.0)
         tmpLabel.textAlignment = .center
         tmpLabel.isOpaque = false
+        tmpLabel.adjustsFontSizeToFitWidth = true
         
         return tmpLabel
     }()

@@ -12,7 +12,7 @@ import ReactiveCocoa
 import Result
 import SnapKit
 
-class StoryDetailViewController: UIViewController, UIScrollViewDelegate, UIWebViewDelegate {
+class StoryDetailViewController: UIViewController, UIScrollViewDelegate, UIWebViewDelegate, CAAnimationDelegate {
     
     let scrollViewOffsetTop: CGFloat = 84.0
     var titleImageViewOriginalHeight: CGFloat = 0.0
@@ -20,6 +20,8 @@ class StoryDetailViewController: UIViewController, UIScrollViewDelegate, UIWebVi
     let labelGap: CGFloat = 10.0               // 主标题label与副标题label的间距
     let titleLabelHeight: CGFloat = 53.0       // 主标题label的高度
     let subtitleLabelHeight: CGFloat = 12.0    // 副标题label的高度
+    
+    var numImageView: UIImageView!
     
     lazy var gradientView: GradientView = {
         let tmpView: GradientView = GradientView(frame: CGRect(x: 0, y: 0, width: self.view.frame.size.width, height: 0))
@@ -322,10 +324,62 @@ class StoryDetailViewController: UIViewController, UIScrollViewDelegate, UIWebVi
     }
     
     func vote() {
-        let alert: UIAlertController = UIAlertController(title: nil, message: String(format: "收到了%d个赞", self.storyViewModel!.storyDetailExtraModel!.popularity), preferredStyle: .alert)
-        let alertAction: UIAlertAction = UIAlertAction(title: "确定", style: .default, handler: nil)
-        alert.addAction(alertAction)
-        self.present(alert, animated: true, completion: nil)
+        if self.bottomActionView.voteButton.voted {
+            let numStr = String(format: "%d", self.storyViewModel!.storyDetailExtraModel!.popularity)
+            self.bottomActionView.voteButton.badgeText = numStr
+        }else {
+            let transferFrame = self.bottomActionView.convert(self.bottomActionView.voteButton.frame, to: self.view)
+            let numImageViewFrame = CGRect(x: transferFrame.origin.x - 18, y: transferFrame.origin.y, width: 100, height: 30)
+            numImageView = UIImageView(image: UIImage(named: "News_Number_Bg"))
+            let numLabel: UILabel = UILabel()
+            numLabel.frame = CGRect(x: 0, y: 0, width: 100, height: 25)
+            numLabel.textColor = UIColor.white
+            numLabel.textAlignment = .center
+            numLabel.font = UIFont.systemFont(ofSize: 14.0)
+            
+            numImageView.frame = numImageViewFrame
+            numImageView.addSubview(numLabel)
+            self.view.addSubview(numImageView)
+            
+            let numStr = String(format: "%d", self.storyViewModel!.storyDetailExtraModel!.popularity + 1)
+            numLabel.text = numStr
+            self.bottomActionView.voteButton.badgeText = numStr
+            
+            let scaleAnimation = CABasicAnimation(keyPath: "transform.scale")
+            scaleAnimation.fromValue = 0
+            scaleAnimation.toValue = 1
+            
+            let positionYAnimation = CABasicAnimation(keyPath: "position.y")
+            positionYAnimation.byValue = -35
+            
+            let animationGroup = CAAnimationGroup()
+            animationGroup.animations = [scaleAnimation, positionYAnimation]
+            animationGroup.fillMode = kCAFillModeForwards
+            animationGroup.isRemovedOnCompletion = false
+            animationGroup.duration = 0.15
+            animationGroup.delegate = self
+            numImageView.layer.add(animationGroup, forKey: "groupAnimation")
+        }
+        
+        self.bottomActionView.voteButton.voted = !self.bottomActionView.voteButton.voted
+    }
+    
+    func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now()+DispatchTimeInterval.milliseconds(600)) {
+            let scaleAnimation2 = CABasicAnimation(keyPath: "transform.scale")
+            scaleAnimation2.fromValue = 1
+            scaleAnimation2.toValue = 0
+            
+            let positionYAnimation2 = CABasicAnimation(keyPath: "position.y")
+            positionYAnimation2.byValue = 35
+            
+            let animationGroup2 = CAAnimationGroup()
+            animationGroup2.animations = [scaleAnimation2, positionYAnimation2]
+            animationGroup2.fillMode = kCAFillModeForwards
+            animationGroup2.isRemovedOnCompletion = false
+            animationGroup2.duration = 0.15
+            self.numImageView.layer.add(animationGroup2, forKey: "groupAnimation2")
+        }
     }
     
     func comment() {
