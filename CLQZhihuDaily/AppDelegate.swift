@@ -24,9 +24,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         
-        DispatchQueue.global(qos: .default).async {
-            self.loadStartImage()
-        }
+        // 新版知乎日报中，获取Splash Image的接口貌似停用了，屏蔽获取启动图片操作，直接跳转到主界面
+//        DispatchQueue.global(qos: .default).async {
+//            self.loadStartImage()
+//        }
         
         return true
     }

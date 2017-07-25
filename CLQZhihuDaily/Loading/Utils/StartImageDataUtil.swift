@@ -18,7 +18,7 @@ class StartImageDataUtil: NSObject {
     /// 获取启动页的image的Url地址
     func fetchStartImageUrl() -> SignalProducer<Dictionary<String, String>, NSError> {
         return SignalProducer<Dictionary<String, String>, NSError>({ (observer, _) in
-            let url = String(format: "%@%@", Common.API_URL_START_IMAGE, "1080*1776")//"1242*1920")
+            let url = String(format: "%@%@", Common.API_URL_START_IMAGE, "1242*1920")//"1080*1776")//"1242*1920")
             Alamofire.request(url, method: .get, parameters: nil, encoding: JSONEncoding.default, headers: nil).responseJSON(completionHandler: { (response) in
                 switch(response.result) {
                 case .success:
