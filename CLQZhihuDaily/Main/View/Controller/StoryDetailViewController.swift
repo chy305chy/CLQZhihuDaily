@@ -296,7 +296,7 @@ class StoryDetailViewController: UIViewController, UIScrollViewDelegate, UIWebVi
         let selectedIndexPath: IndexPath! = self.storyViewModel!.selectedIndexPath
         // 上拉加载下一条
         var tmpIndexPath: IndexPath!
-        if selectedIndexPath.row + 1 > self.storyViewModel!.listStoryModels[selectedIndexPath.section].count {
+        if selectedIndexPath.row + 1 >= self.storyViewModel!.listStoryModels[selectedIndexPath.section].count {
             // 到下一个section
             tmpIndexPath = IndexPath(row: 0, section: selectedIndexPath.section + 1)
         }else {
