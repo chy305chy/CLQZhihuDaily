@@ -67,6 +67,10 @@ class StoryDetailViewController: UIViewController, UIScrollViewDelegate, UIWebVi
         tmpView.scrollView.delegate = self
         tmpView.scrollView.backgroundColor = UIColor.white
         tmpView.delegate = self
+        // 适配iOS11
+        if #available(iOS 11.0, *) {
+            tmpView.scrollView.contentInsetAdjustmentBehavior = .never
+        }
         
         return tmpView
     }()
