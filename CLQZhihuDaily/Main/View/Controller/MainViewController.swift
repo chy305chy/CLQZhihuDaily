@@ -88,6 +88,12 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
         self.storyTableView.showsVerticalScrollIndicator = false
         self.storyTableView.separatorInset = UIEdgeInsetsMake(0, 10, 0, 15);
         self.storyTableView.separatorColor = UIColor(colorLiteralRed: 235/255, green: 235/255, blue: 235/255, alpha: 1.0);
+        
+        // 适配iOS11
+        if #available(iOS 11.0, *) {
+            self.storyTableView.contentInsetAdjustmentBehavior = .never
+        }
+        
         self.view.addSubview(self.storyTableView)
         
         setNavigationBarTransparent()
@@ -214,33 +220,34 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
         if (scrollView.isKind(of: UITableView.self)) {
             var offset = scrollView.contentOffset
             let offsetY = offset.y
-            
+            print(offsetY)
             if offsetY < pullDistance {
                 if !refreshTrigger {
                     self.loadCircleAnimatedView.isHidden = false
                     self.loadCircleAnimatedView.updateCircle(byRatio: (pullDistance-offsetY)/pullDistance)
                 }
-                
+
                 /* 固定tableView bounces的最大距离 */
-                if (offsetY <= 0) {
-                    offset.y = 0
-                    scrollView.contentOffset = offset;
+                if (offsetY <= 0.0) {
+                    offset.y = 0.0
+                    scrollView.setContentOffset(offset, animated: false)
                 }
-                
-                var frame = cyclePictureView.frame
-                frame.origin.y = offsetY
-                frame.size.height = topScrollViewHeight + (pullDistance - offsetY)
-                cyclePictureView.frame = frame
+
+                if offsetY > 0.0 {
+                    var frame = cyclePictureView.frame
+                    frame.origin.y = offsetY
+                    frame.size.height = topScrollViewHeight + (pullDistance - offsetY)
+                    cyclePictureView.frame = frame
+                }
             }else {
                 self.loadCircleAnimatedView.isHidden = true
             }
-            
+
             if offsetY >= 0 {
                 /* NavBar透明度渐变 */
                 let alpha = min(1, (offsetY - (self.pullDistance + 20)) / ((self.pullDistance + 20) + prelude))
                 self.navigationController?.navigationBar.clq_setBackgroundColor(backgroundColor: Common.GLOBAL_COLOR_BLUE.withAlphaComponent(alpha))
-                
-                
+
                 /* 获取往期的story */
                 if offsetY > scrollView.contentSize.height - self.view.bounds.size.height - 2*self.cellHeight {
                     /* 如果不加判断，下拉到临界位置时，load方法会被多次调用 */
@@ -249,7 +256,7 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
                     }
                 }
             }
-            
+
             if offsetY > self.secondSectionOffsetY {
                 self.storyTableView.contentInset = UIEdgeInsetsMake(20, 0, 0, 0)
                 self.navTitleLabel.text = ""

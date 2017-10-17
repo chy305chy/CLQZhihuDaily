@@ -506,7 +506,7 @@
 				TargetAttributes = {
 					B6CFFBC71E4D6ECD00C6949E = {
 						CreatedOnToolsVersion = 8.2.1;
-						DevelopmentTeam = K57N288FR5;
+						DevelopmentTeam = 66UJ9ETZ8J;
 						LastSwiftMigration = 0820;
 						ProvisioningStyle = Automatic;
 					};
@@ -816,11 +816,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				DEVELOPMENT_TEAM = K57N288FR5;
+				DEVELOPMENT_TEAM = 66UJ9ETZ8J;
 				GCC_PREFIX_HEADER = "";
 				INFOPLIST_FILE = CLQZhihuDaily/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.cuilanqing.CLQZhihuDaily;
+				PRODUCT_BUNDLE_IDENTIFIER = com.cuilanqing.test.CLQZhihuDaily;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -834,11 +834,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				DEVELOPMENT_TEAM = K57N288FR5;
+				DEVELOPMENT_TEAM = 66UJ9ETZ8J;
 				GCC_PREFIX_HEADER = "";
 				INFOPLIST_FILE = CLQZhihuDaily/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.cuilanqing.CLQZhihuDaily;
+				PRODUCT_BUNDLE_IDENTIFIER = com.cuilanqing.test.CLQZhihuDaily;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_VERSION = 3.0;

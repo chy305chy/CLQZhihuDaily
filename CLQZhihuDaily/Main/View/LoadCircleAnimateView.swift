@@ -17,6 +17,7 @@ class LoadCircleAnimateView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         currentRatio = 0.0
+        
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -25,7 +26,6 @@ class LoadCircleAnimateView: UIView {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        
         self.addCircleLayers()
     }
 
